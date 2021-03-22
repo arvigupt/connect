@@ -92,16 +92,15 @@ ALTER TABLE phyllo_schema.dp_refresh_token_builder OWNER TO phyllo;
 CREATE TABLE IF NOT EXISTS phyllo_schema.dp_login_path (
 	data_platform_id uuid NOT NULL,
 	level character varying(100) NOT NULL,
-	sequence_no character varying(100) NOT NULL,
+	sequence_no int NOT NULL,
 	element_identifier character varying(500),
 	op_name character varying(50) NOT NULL, 
 	element_key_name character varying(100),
 	element_key_value character varying(2048),
-	UNIQUE(data_platform_id, sequence_no),
 	CONSTRAINT pkey_dp_login_path_id PRIMARY KEY(id),
 	CONSTRAINT fkey_dp_login_path_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id)
 ) INHERITS (phyllo_schema.common);
-ALTER TABLE phyllo_schema.applicants OWNER TO phyllo;
+ALTER TABLE phyllo_schema.dp_login_path OWNER TO phyllo;
 
 
 CREATE TABLE IF NOT EXISTS phyllo_schema.dp_employer_info (
@@ -162,86 +161,86 @@ CREATE TABLE IF NOT EXISTS phyllo_schema.dp_applicant_login_info (
 ) INHERITS (phyllo_schema.common);
 ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
 
-
-CREATE TABLE IF NOT EXISTS phyllo_schema.applicant_book_info (
-	tenant_id uuid NOT NULL,
-	applicant_id uuid NOT NULL,
-	name character varying(100) NOT NULL,
-	UNIQUE(applicant_id, name),
-	CONSTRAINT pkey_dp_applicant_login_info_id PRIMARY KEY(id),
-	CONSTRAINT fkey_applicant_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id)
-	CONSTRAINT fkey_dp_applicant_login_info_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id),
-	CONSTRAINT fkey_dp_applicant_login_info_applicant_id FOREIGN KEY(applicant_id) REFERENCES phyllo_schema.applicant(id)
-) INHERITS (phyllo_schema.common);
-ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
-
-
-CREATE TABLE IF NOT EXISTS phyllo_schema.applicant_doc_info (
-	tenant_id uuid NOT NULL,
-	applicant_id uuid NOT NULL,
-	book_id uuid NOT NULL,
-	name character varying(100) NOT NULL,
-	path character varying(100) NOT NULL,
-	type character varying(100) NOT NULL,
-	CONSTRAINT pkey_applicant_doc_info_id PRIMARY KEY(id),
-	CONSTRAINT fkey_applicant_doc_info_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id)
-	CONSTRAINT fkey_applicant_doc_info_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id),
-	CONSTRAINT fkey_applicant_doc_info_applicant_id FOREIGN KEY(applicant_id) REFERENCES phyllo_schema.applicant(id)
-) INHERITS (phyllo_schema.common);
-ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
+--
+--CREATE TABLE IF NOT EXISTS phyllo_schema.applicant_book_info (
+--	tenant_id uuid NOT NULL,
+--	applicant_id uuid NOT NULL,
+--	name character varying(100) NOT NULL,
+--	UNIQUE(applicant_id, name),
+--	CONSTRAINT pkey_dp_applicant_login_info_id PRIMARY KEY(id),
+--	CONSTRAINT fkey_applicant_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id)
+--	CONSTRAINT fkey_dp_applicant_login_info_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id),
+--	CONSTRAINT fkey_dp_applicant_login_info_applicant_id FOREIGN KEY(applicant_id) REFERENCES phyllo_schema.applicant(id)
+--) INHERITS (phyllo_schema.common);
+--ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
+--
+--
+--CREATE TABLE IF NOT EXISTS phyllo_schema.applicant_doc_info (
+--	tenant_id uuid NOT NULL,
+--	applicant_id uuid NOT NULL,
+--	book_id uuid NOT NULL,
+--	name character varying(100) NOT NULL,
+--	path character varying(100) NOT NULL,
+--	type character varying(100) NOT NULL,
+--	CONSTRAINT pkey_applicant_doc_info_id PRIMARY KEY(id),
+--	CONSTRAINT fkey_applicant_doc_info_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id)
+--	CONSTRAINT fkey_applicant_doc_info_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id),
+--	CONSTRAINT fkey_applicant_doc_info_applicant_id FOREIGN KEY(applicant_id) REFERENCES phyllo_schema.applicant(id)
+--) INHERITS (phyllo_schema.common);
+--ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
 
 
 
 -- upwork
-INSERT INTO phyllo_schema.data_platform('id', 'name', 'url', 'logo_url', 'is_oauth_supported', is_uname_pwd_supported) VALUES
+INSERT INTO phyllo_schema.data_platform(id, name, url, logo_url, is_oauth_supported, is_uname_pwd_supported) VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', 'upwork', 'https://www.upwork.com', NULL, true, true) ON CONFLICT DO NOTHING;
 
-INSERT INTO phyllo_schema.dp_login_path('data_platform_id', 'level', 'sequence_no', 'element_identifier', 'op_name', 'element_key_name', 'element_key_value')
+INSERT INTO phyllo_schema.dp_login_path(data_platform_id, level, sequence_no, element_identifier, op_name, element_key_name, element_key_value)
 VALUES
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '1', NULL, 'navigate-url', 'login-url', 'https://www.upwork.com/ab/account-security/login'),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '2', 'xpath=//a[text()=\'Upwork\']', 'verify', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '3', 'id=login_username', 'fill', 'username', NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '4', 'id=login_password_continue', 'click', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '5', '{"id=login_password": "1.1", "id=login_control_submit": "3"}', 'verify-and-fork', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 1, NULL, 'navigate-url', 'login-url', 'https://www.upwork.com/ab/account-security/login'),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 2, 'xpath=//a[text()=\'Upwork\']', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 3, 'id=login_username', 'fill', 'username', NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 4, 'id=login_password_continue', 'click', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 5, '{"id=login_password": "1.1", "id=login_control_submit": "3"}', 'verify-and-fork', NULL, NULL),
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '1', 'id=login_password', 'fill', 'password', NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '2', 'xpath=//input[@id=\'login_rememberme\']/following-sibling::span', 'check', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '3', 'id=login_control_continue', 'click', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '4', '{"xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]": "1.2", "xpath=//h2[text()=\'Confirm that it\'s you\']": "1.3"}', 'verify-and-fork', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', 1, 'id=login_password', 'fill', 'password', NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', 2, 'xpath=//input[@id=\'login_rememberme\']/following-sibling::span', 'check', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', 3, 'id=login_control_continue', 'click', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', 4, '{"xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]": "1.2", "xpath=//h2[text()=\'Confirm that it\'s you\']": "1.3"}', 'verify-and-fork', NULL, NULL),
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '1', NULL, 'save-login-session', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '2', NULL, 'operation-completed', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '3', NULL, 'close-window', NULL, NULL);
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 1, NULL, 'save-login-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 2, NULL, 'operation-completed', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 3, NULL, 'close-window', NULL, NULL);
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', '1', NULL, 'save-mfa-session', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', '2', NULL, 'operation-in-progress', 'resume-from', '2'),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', '3', NULL, 'close-window', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', 1, NULL, 'save-mfa-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', 2, NULL, 'operation-in-progress', 'resume-from', '2'),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', 3, NULL, 'close-window', NULL, NULL),
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '1', NULL, 'load-mfa-session', 'mfa-url', NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '2', 'xpath=//h2[text()=\'Confirm that it\'s you\']', 'verify', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '3', 'id=login_deviceAuthOtp_otp', 'fill', 'otp', NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '4', 'id=login_deviceAuthOtp_remember', 'check', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '5', 'id=login_control_continue', 'click', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '6', 'xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]', 'verify', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '7', NULL, 'save-login-session', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '8', NULL, 'operation-completed', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '9', NULL, 'close-window', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 1, NULL, 'load-mfa-session', 'mfa-url', NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 2, 'xpath=//h2[text()=\'Confirm that it\'s you\']', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 3, 'id=login_deviceAuthOtp_otp', 'fill', 'otp', NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 4, 'id=login_deviceAuthOtp_remember', 'check', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 5, 'id=login_control_continue', 'click', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 6, 'xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 7, NULL, 'save-login-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 8, NULL, 'operation-completed', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 9, NULL, 'close-window', NULL, NULL),
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '3', '1', NULL, 'not-supported', NULL, NULL)
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '3', 1, NULL, 'not-supported', NULL, NULL)
 
  ON CONFLICT DO NOTHING;
 
 
 
-INSERT INTO phyllo_schema.tenant('id', 'name', 'url', 'logo_url', 'domain_name', 'status') VALUES 
+INSERT INTO phyllo_schema.tenant(id, name, url, logo_url, domain_name, status) VALUES
 ('fc14a17d-0667-4bd6-856e-b4aaec68984c', 'phyllo', 'https://getphyllo.com', NULL, 'getphyllo.com', 'ACTIVATED');
 
 
-INSERT INTO phyllo_schema.tenant_credential('tenant_id', 'api_key', 'api_secret', 'sdk_token', 'access_token') VALUES 
+INSERT INTO phyllo_schema.tenant_credential(tenant_id, api_key, api_secret, sdk_token, access_token) VALUES
 ('fc14a17d-0667-4bd6-856e-b4aaec68984c', 'api_key', 'api_secret', 'sdk_token', 'access_token');
 
 
-INSERT INTO phyllo_schema.applicant('tenant_id', 'applicant_identifier') VALUES 
+INSERT INTO phyllo_schema.applicant(tenant_id, applicant_identifier) VALUES
 ('fc14a17d-0667-4bd6-856e-b4aaec68984c', '5a3ab477-1be8-4b37-9e61-a51174c40d09');
 
 
