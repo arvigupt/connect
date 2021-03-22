@@ -1,0 +1,244 @@
+
+CREATE SCHEMA IF NOT EXISTS phyllo_schema;
+
+-- common tables
+CREATE TABLE IF NOT EXISTS phyllo_schema.common (
+	id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+	last_updated_by_user character varying(36),
+    last_updated_at_user timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    last_updated_by_sys character varying(36),
+    last_updated_at_sys timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    created_by_user character varying(36),
+    created_at_user timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+ALTER TABLE phyllo_schema.common OWNER TO phyllo;
+
+
+-- global tables
+CREATE TABLE IF NOT EXISTS phyllo_schema.data_platform (
+	name character varying(100) NOT NULL,
+	url character varying(2048) NOT NULL,
+	logo_url character varying(2048),
+	is_oauth_supported boolean DEFAULT false NOT NULL,
+	is_uname_pwd_supported boolean DEFAULT false NOT NULL,
+	CONSTRAINT pkey_data_platform_id PRIMARY KEY(id)
+) INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.data_platform OWNER TO phyllo;
+
+
+CREATE TABLE IF NOT EXISTS phyllo_schema.dp_oauth_information (
+	data_platform_id uuid NOT NULL,
+	authorize_url character varying(2048) NOT NULL,
+	token_url character varying(2048) NOT NULL,
+	refresh_token_url character varying(2048) NOT NULL,
+	client_id character varying(200) NOT NULL,
+	client_secret character varying(500) NOT NULL,
+	redirect_url character varying(2048) NOT NULL,
+	CONSTRAINT pkey_dp_oauth_information_id PRIMARY KEY(id),
+	CONSTRAINT fkey_dp_oauth_information_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id)
+)INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.dp_oauth_information OWNER TO phyllo;
+
+
+CREATE TABLE IF NOT EXISTS phyllo_schema.dp_authorize_builder (
+	data_platform_id uuid NOT NULL,
+	method character varying(10) NOT NULL,
+	client_id_param_name character varying(100) NOT NULL,
+	client_id_param_name_in character varying(50) NOT NULL,
+	client_secret_param_name character varying(100) NOT NULL,
+	client_secret_param_name_in character varying(50) NOT NULL,
+	redirect_url_param_name character varying(100) NOT NULL,
+	redirect_url_param_name_in character varying(50) NOT NULL,
+	content_type_header_name character varying(100) NOT NULL,
+	CONSTRAINT pkey_dp_authorize_builder_id PRIMARY KEY(id),
+	CONSTRAINT fkey_dp_authorize_builder_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id)
+)INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.dp_authorize_builder OWNER TO phyllo;
+
+
+CREATE TABLE IF NOT EXISTS phyllo_schema.dp_token_builder (
+	data_platform_id uuid NOT NULL,
+	method character varying(10) NOT NULL,
+	client_id_param_name character varying(100) NOT NULL,
+	client_id_param_name_in character varying(50) NOT NULL,
+	client_secret_param_name character varying(100) NOT NULL,
+	client_secret_param_name_in character varying(50) NOT NULL,
+	redirect_url_param_name character varying(100) NOT NULL,
+	redirect_url_param_name_in character varying(50) NOT NULL,
+	content_type_header_name character varying(100) NOT NULL,
+	CONSTRAINT pkey_dp_token_builder_id PRIMARY KEY(id),
+	CONSTRAINT fkey_dp_token_builder_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id)
+)INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.dp_token_builder OWNER TO phyllo;
+
+
+CREATE TABLE IF NOT EXISTS phyllo_schema.dp_refresh_token_builder (
+	data_platform_id uuid NOT NULL,
+	method character varying(10) NOT NULL,
+	client_id_param_name character varying(100) NOT NULL,
+	client_id_param_name_in character varying(50) NOT NULL,
+	client_secret_param_name character varying(100) NOT NULL,
+	client_secret_param_name_in character varying(50) NOT NULL,
+	redirect_url_param_name character varying(100) NOT NULL,
+	redirect_url_param_name_in character varying(50) NOT NULL,
+	content_type_header_name character varying(50) NOT NULL,
+	CONSTRAINT pkey_dp_refresh_token_builder_id PRIMARY KEY(id),
+	CONSTRAINT fkey_dp_refresh_token_builder_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id)
+)INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.dp_refresh_token_builder OWNER TO phyllo;
+
+
+-- op_name enum = fill | click | check | uncheck | fetch | verify | save-mfa-session | save-login-session | open-browser | close-browser | navigate-url | verify-and-fork | operaton-completed | operaton-in-progress | 
+CREATE TABLE IF NOT EXISTS phyllo_schema.dp_login_path (
+	data_platform_id uuid NOT NULL,
+	level character varying(100) NOT NULL,
+	sequence_no character varying(100) NOT NULL,
+	element_identifier character varying(500),
+	op_name character varying(50) NOT NULL, 
+	element_key_name character varying(100),
+	element_key_value character varying(2048),
+	UNIQUE(data_platform_id, sequence_no),
+	CONSTRAINT pkey_dp_login_path_id PRIMARY KEY(id),
+	CONSTRAINT fkey_dp_login_path_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id)
+) INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.applicants OWNER TO phyllo;
+
+
+CREATE TABLE IF NOT EXISTS phyllo_schema.dp_employer_info (
+) INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.dp_employer_info OWNER TO phyllo;
+
+
+-- tenant tables
+CREATE TABLE IF NOT EXISTS phyllo_schema.tenant (
+	name character varying(200) NOT NULL,
+	url character varying(2048) NOT NULL,
+	logo_url character varying(2048),
+	domain_name character varying(200) NOT NULL,
+	status character varying(50) NOT NULL, -- activated | deactivated | pending
+	CONSTRAINT pkey_tenant_id PRIMARY KEY(id)
+) INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.tenant OWNER TO phyllo;
+
+
+CREATE TABLE IF NOT EXISTS phyllo_schema.tenant_credential (
+	tenant_id uuid NOT NULL,
+	api_key character varying(100) NOT NULL,
+	api_secret character varying(2048) NOT NULL,
+	sdk_token character varying(100) NOT NULL,
+	access_token character varying(2048),
+	CONSTRAINT pkey_tenant_credential_id PRIMARY KEY(id),
+	CONSTRAINT fkey_tenant_credential_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id)
+) INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.tenant_credential OWNER TO phyllo;
+
+
+CREATE TABLE IF NOT EXISTS phyllo_schema.applicant (
+	tenant_id uuid NOT NULL,
+	applicant_identifier character varying(100) NOT NULL,
+	UNIQUE(tenant_id, applicant_identifier),
+	CONSTRAINT pkey_applicant_id PRIMARY KEY(id),
+	CONSTRAINT fkey_applicant_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id)
+) INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.applicant OWNER TO phyllo;
+
+
+CREATE TABLE IF NOT EXISTS phyllo_schema.dp_applicant_login_info (
+	tenant_id uuid NOT NULL,
+	data_platform_id uuid NOT NULL,
+	applicant_id uuid NOT NULL,
+	username character varying(100) NOT NULL,
+	pwd character varying(512),
+	is_mfa_enabled boolean DEFAULT false NOT NULL,
+	mfa_url character varying(2048),
+	mfa_cookies character varying,
+	login_url character varying(2048),
+	login_cookies character varying,
+	UNIQUE(data_platform_id, applicant_id),
+	CONSTRAINT pkey_dp_applicant_login_info_id PRIMARY KEY(id),
+	CONSTRAINT fkey_applicant_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id),
+	CONSTRAINT fkey_dp_applicant_login_info_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id),
+	CONSTRAINT fkey_dp_applicant_login_info_applicant_id FOREIGN KEY(applicant_id) REFERENCES phyllo_schema.applicant(id)
+) INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
+
+
+CREATE TABLE IF NOT EXISTS phyllo_schema.applicant_book_info (
+	tenant_id uuid NOT NULL,
+	applicant_id uuid NOT NULL,
+	name character varying(100) NOT NULL,
+	UNIQUE(applicant_id, name),
+	CONSTRAINT pkey_dp_applicant_login_info_id PRIMARY KEY(id),
+	CONSTRAINT fkey_applicant_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id)
+	CONSTRAINT fkey_dp_applicant_login_info_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id),
+	CONSTRAINT fkey_dp_applicant_login_info_applicant_id FOREIGN KEY(applicant_id) REFERENCES phyllo_schema.applicant(id)
+) INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
+
+
+CREATE TABLE IF NOT EXISTS phyllo_schema.applicant_doc_info (
+	tenant_id uuid NOT NULL,
+	applicant_id uuid NOT NULL,
+	book_id uuid NOT NULL,
+	name character varying(100) NOT NULL,
+	path character varying(100) NOT NULL,
+	type character varying(100) NOT NULL,
+	CONSTRAINT pkey_applicant_doc_info_id PRIMARY KEY(id),
+	CONSTRAINT fkey_applicant_doc_info_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id)
+	CONSTRAINT fkey_applicant_doc_info_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id),
+	CONSTRAINT fkey_applicant_doc_info_applicant_id FOREIGN KEY(applicant_id) REFERENCES phyllo_schema.applicant(id)
+) INHERITS (phyllo_schema.common);
+ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
+
+
+
+-- upwork
+INSERT INTO phyllo_schema.data_platform('id', 'name', 'url', 'logo_url', 'is_oauth_supported', is_uname_pwd_supported) VALUES
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', 'upwork', 'https://www.upwork.com', NULL, true, true) ON CONFLICT DO NOTHING;
+
+INSERT INTO phyllo_schema.dp_login_path('data_platform_id', 'level', 'sequence_no', 'element_identifier', 'op_name', 'element_key_name', 'element_key_value')
+VALUES
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '1', NULL, 'navigate-url', 'login-url', 'https://www.upwork.com/ab/account-security/login'),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '2', 'xpath=//a[text()=\'Upwork\']', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '3', 'id=login_username', 'fill', 'username', NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '4', 'id=login_password_continue', 'click', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '5', 'xpath=//a[text()=\'Upwork\']', 'verify', NULL, NULL), -- update xpath
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '6', 'id=login_password', 'fill', 'password', NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '7', 'xpath=//input[@id=\'login_rememberme\']/following-sibling::span', 'check', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '8', 'id=login_control_continue', 'click', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '9', '{"xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]": "1.1", "xpath=//h2[text()=\'Confirm that it\'s you\']": "1.2"}', 'verify-and-fork', NULL, NULL),
+
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '1', NULL, 'save-login-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '2', NULL, 'operaton-completed', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '3', NULL, 'close-window', NULL, NULL);
+
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '1', NULL, 'save-mfa-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '2', NULL, 'operaton-in-progress', 'resume-from', '2'),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '3', NULL, 'close-window', NULL, NULL),
+
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '1', NULL, 'load-mfa-session', 'mfa-url', NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '2', 'xpath=//h2[text()=\'Confirm that it\'s you\']', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '3', 'id=login_deviceAuthOtp_otp', 'fill', 'otp', NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '4', 'id=login_deviceAuthOtp_remember', 'check', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '5', 'id=login_control_continue', 'click', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '6', 'xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '7', NULL, 'save-login-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '8', NULL, 'operaton-completed', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '9', NULL, 'close-window', NULL, NULL)
+
+ ON CONFLICT DO NOTHING;
+
+
+
+INSERT INTO phyllo_schema.tenant('id', 'name', 'url', 'logo_url', 'domain_name', 'status') VALUES 
+('fc14a17d-0667-4bd6-856e-b4aaec68984c', 'phyllo', 'https://getphyllo.com', NULL, 'getphyllo.com', 'ACTIVATED');
+
+
+INSERT INTO phyllo_schema.tenant_credential('tenant_id', 'api_key', 'api_secret', 'sdk_token', 'access_token') VALUES 
+('fc14a17d-0667-4bd6-856e-b4aaec68984c', 'api_key', 'api_secret', 'sdk_token', 'access_token');
+
+
+INSERT INTO phyllo_schema.applicant('tenant_id', 'applicant_identifier') VALUES 
+('fc14a17d-0667-4bd6-856e-b4aaec68984c', '5a3ab477-1be8-4b37-9e61-a51174c40d09');
+
+

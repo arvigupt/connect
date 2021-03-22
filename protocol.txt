@@ -1,0 +1,84 @@
+0. 
+	a. query level 1 instructions for speicific data platform.
+	b. sort results on sequence_numbers
+	c. execute all instructions one by one
+	d.  
+
+
+1. fill
+	a. fill the element_key_value of element_key_name in the element_identifier field. 
+	b. element_identifier and element_key_name is the mandatory attribute.
+	c. if element_key_value is not null then use that to fill the value else use the value present in the element_key_name variable
+	d. element_key_name and defined variable should have same name.
+
+
+2. click
+	a. click on the element_identifier field
+	b. element_identifier is mandatory attribute
+
+
+3. check
+	a. check the element_identifier field. if it is already in checked state then do nothing.
+	b. element_identifier is mandatory attribute
+
+
+4. uncheck
+	a. uncheck the element_identifier field. if it is already in unchecked state then do nothing.
+	b. element_identifier is mandatory attribute
+
+
+5. fetch
+	a. fetch the value of element_identifier field and store in the element_key_value. 
+	b. element_identifier is mandatory attribute
+	c. element_key_name and defined variable should have same name.
+
+
+6. verify
+	a. verify if element_identifier field exists and is in visible state.
+	b. element_identifier is mandatory attribute
+
+
+7. save-mfa-session
+	a. save mfa session in the database. mfa session includes url and cookies
+
+
+8. save-login-session
+	a. save login session in the database. login session includes url and cookies
+
+
+9. close-browser
+	a. close the browser window
+
+
+10. navigate-url
+	a. navigate the url value present in the element_key_value
+
+
+11. verify-and-fork
+	a. verify any one of the xpaths mentioned in the json formatted keys. 
+	b. only one xpath will be verified.
+	c. then again query all the instructons mentioned in the value of the verified json key 
+	d. element_identifier is mandatory attribute
+	e. xpaths present in the element_identifier should be in the json format
+
+
+12. operation-completed
+	a. operation is completed.
+	b. cleanup information stored if there is any
+
+
+13. operation-in-progress
+	a. operation is in progress and must be resumed after collecting next input from the applicant
+	b. read information to resume work.
+	c. level information will be stored in the element_key_value field and element_key_name will contain "resume-from" key name
+
+
+14. load-mfa-session
+	a. load mfa session which includes navigating url and loading cookies
+
+
+15. load-login-session
+	a. load login session which includes navigating url and loading cookies
+
+
+
