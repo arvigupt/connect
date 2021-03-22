@@ -202,19 +202,20 @@ VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '2', 'xpath=//a[text()=\'Upwork\']', 'verify', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '3', 'id=login_username', 'fill', 'username', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '4', 'id=login_password_continue', 'click', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '5', 'xpath=//a[text()=\'Upwork\']', 'verify', NULL, NULL), -- update xpath
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '6', 'id=login_password', 'fill', 'password', NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '7', 'xpath=//input[@id=\'login_rememberme\']/following-sibling::span', 'check', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '8', 'id=login_control_continue', 'click', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '9', '{"xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]": "1.1", "xpath=//h2[text()=\'Confirm that it\'s you\']": "1.2"}', 'verify-and-fork', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '5', '{"id=login_password": "1.1", "id=login_control_submit": "3"}', 'verify-and-fork', NULL, NULL),
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '1', NULL, 'save-login-session', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '2', NULL, 'operaton-completed', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '3', NULL, 'close-window', NULL, NULL);
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '1', 'id=login_password', 'fill', 'password', NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '2', 'xpath=//input[@id=\'login_rememberme\']/following-sibling::span', 'check', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '3', 'id=login_control_continue', 'click', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '4', '{"xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]": "1.2", "xpath=//h2[text()=\'Confirm that it\'s you\']": "1.3"}', 'verify-and-fork', NULL, NULL),
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '1', NULL, 'save-mfa-session', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '2', NULL, 'operaton-in-progress', 'resume-from', '2'),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '3', NULL, 'close-window', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '1', NULL, 'save-login-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '2', NULL, 'operaton-completed', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '3', NULL, 'close-window', NULL, NULL);
+
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', '1', NULL, 'save-mfa-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', '2', NULL, 'operaton-in-progress', 'resume-from', '2'),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', '3', NULL, 'close-window', NULL, NULL),
 
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '1', NULL, 'load-mfa-session', 'mfa-url', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '2', 'xpath=//h2[text()=\'Confirm that it\'s you\']', 'verify', NULL, NULL),
@@ -224,7 +225,9 @@ VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '6', 'xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]', 'verify', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '7', NULL, 'save-login-session', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '8', NULL, 'operaton-completed', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '9', NULL, 'close-window', NULL, NULL)
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '9', NULL, 'close-window', NULL, NULL),
+
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '3', '1', NULL, 'not-supported', NULL, NULL)
 
  ON CONFLICT DO NOTHING;
 

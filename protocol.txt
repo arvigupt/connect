@@ -57,7 +57,7 @@
 11. verify-and-fork
 	a. verify any one of the xpaths mentioned in the json formatted keys. 
 	b. only one xpath will be verified.
-	c. then again query all the instructons mentioned in the value of the verified json key 
+	c. then again query all the instructions mentioned in the value of the verified json key
 	d. element_identifier is mandatory attribute
 	e. xpaths present in the element_identifier should be in the json format
 
@@ -79,6 +79,10 @@
 
 15. load-login-session
 	a. load login session which includes navigating url and loading cookies
+
+
+16. not-supported
+    a.
 
 
 
