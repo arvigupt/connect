@@ -168,10 +168,9 @@ CREATE TABLE IF NOT EXISTS phyllo_schema.applicant_book_info (
 	applicant_id uuid NOT NULL,
 	name character varying(100) NOT NULL,
 	UNIQUE(applicant_id, name),
-	CONSTRAINT pkey_dp_applicant_login_info_id PRIMARY KEY(id),
-	CONSTRAINT fkey_applicant_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id)
-	CONSTRAINT fkey_dp_applicant_login_info_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id),
-	CONSTRAINT fkey_dp_applicant_login_info_applicant_id FOREIGN KEY(applicant_id) REFERENCES phyllo_schema.applicant(id)
+	CONSTRAINT pkey_applicant_book_info_id PRIMARY KEY(id),
+	CONSTRAINT fkey_applicant_book_info_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id),
+	CONSTRAINT fkey_applicant_book_info_applicant_id FOREIGN KEY(applicant_id) REFERENCES phyllo_schema.applicant(id)
 ) INHERITS (phyllo_schema.common);
 ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
 
@@ -184,9 +183,9 @@ CREATE TABLE IF NOT EXISTS phyllo_schema.applicant_doc_info (
 	path character varying(100) NOT NULL,
 	type character varying(100) NOT NULL,
 	CONSTRAINT pkey_applicant_doc_info_id PRIMARY KEY(id),
-	CONSTRAINT fkey_applicant_doc_info_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id)
-	CONSTRAINT fkey_applicant_doc_info_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id),
-	CONSTRAINT fkey_applicant_doc_info_applicant_id FOREIGN KEY(applicant_id) REFERENCES phyllo_schema.applicant(id)
+	CONSTRAINT fkey_applicant_doc_info_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id),
+	CONSTRAINT fkey_applicant_doc_info_applicant_id FOREIGN KEY(applicant_id) REFERENCES phyllo_schema.applicant(id),
+	CONSTRAINT fkey_applicant_doc_info_book_id FOREIGN KEY(book_id) REFERENCES phyllo_schema.applicant_book_info(id)
 ) INHERITS (phyllo_schema.common);
 ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
 
@@ -202,20 +201,22 @@ VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '2', 'xpath=//a[text()=\'Upwork\']', 'verify', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '3', 'id=login_username', 'fill', 'username', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '4', 'id=login_password_continue', 'click', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '5', '{"id=login_password": "1.1", "id=login_control_submit": "3"}', 'verify-and-fork', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '5', '{"id=login_password": "1.1", "id=login_control_submit": "1.2"}', 'verify-and-fork', NULL, NULL),
 
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '1', 'id=login_password', 'fill', 'password', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '2', 'xpath=//input[@id=\'login_rememberme\']/following-sibling::span', 'check', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '3', 'id=login_control_continue', 'click', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '4', '{"xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]": "1.2", "xpath=//h2[text()=\'Confirm that it\'s you\']": "1.3"}', 'verify-and-fork', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '4', '{"xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]": "1.1.1", "xpath=//h2[text()=\'Confirm that it\'s you\']": "1.1.2"}', 'verify-and-fork', NULL, NULL),
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '1', NULL, 'save-login-session', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '2', NULL, 'operation-completed', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '3', NULL, 'close-window', NULL, NULL);
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '1', NULL, 'not-supported', NULL, NULL),
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', '1', NULL, 'save-mfa-session', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', '2', NULL, 'operation-in-progress', 'resume-from', '2'),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.3', '3', NULL, 'close-window', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.1', '1', NULL, 'save-login-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.1', '2', NULL, 'operation-completed', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.1', '3', NULL, 'close-window', NULL, NULL),
+
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.2', '1', NULL, 'save-mfa-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.2', '2', NULL, 'operation-in-progress', 'resume-from', '2'),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.2', '3', NULL, 'close-window', NULL, NULL),
 
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '1', NULL, 'load-mfa-session', 'mfa-url', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '2', 'xpath=//h2[text()=\'Confirm that it\'s you\']', 'verify', NULL, NULL),
@@ -225,9 +226,7 @@ VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '6', 'xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]', 'verify', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '7', NULL, 'save-login-session', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '8', NULL, 'operation-completed', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '9', NULL, 'close-window', NULL, NULL),
-
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '3', '1', NULL, 'not-supported', NULL, NULL)
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', '9', NULL, 'close-window', NULL, NULL)
 
  ON CONFLICT DO NOTHING;
 
@@ -243,5 +242,24 @@ INSERT INTO phyllo_schema.tenant_credential('tenant_id', 'api_key', 'api_secret'
 
 INSERT INTO phyllo_schema.applicant('tenant_id', 'applicant_identifier') VALUES 
 ('fc14a17d-0667-4bd6-856e-b4aaec68984c', '5a3ab477-1be8-4b37-9e61-a51174c40d09');
+
+
+-- udemy
+INSERT INTO phyllo_schema.data_platform('id', 'name', 'url', 'logo_url', 'is_oauth_supported', is_uname_pwd_supported) VALUES
+('199a2144-c599-4e06-84f4-d18836127a6b', 'udemy', 'https://www.udemy.com', NULL, true, true) ON CONFLICT DO NOTHING;
+
+INSERT INTO phyllo_schema.dp_login_path('data_platform_id', 'level', 'sequence_no', 'element_identifier', 'op_name', 'element_key_name', 'element_key_value')
+VALUES
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', '1', NULL, 'navigate-url', 'login-url', 'https://www.udemy.com/join/login-popup'),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', '2', 'xpath=//a[text()=\'Udemy\']', 'verify', NULL, NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', '3', 'id=form-item-email', 'fill', 'username', NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', '4', 'id=form-item-password', 'fill', 'password', NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', '5', 'id=submit-id-submit', 'click', NULL, NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', '6', 'xpath=//a[text()=\'Udemy\']', 'verify', NULL, NULL)
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', '7', NULL, 'save-login-session', NULL, NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', '8', NULL, 'operation-completed', NULL, NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', '9', NULL, 'close-window', NULL, NULL)
+
+ON CONFLICT DO NOTHING;
 
 
