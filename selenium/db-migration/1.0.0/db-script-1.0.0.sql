@@ -150,11 +150,12 @@ CREATE TABLE IF NOT EXISTS phyllo_schema.dp_applicant_login_info (
 	username character varying(100) NOT NULL,
 	pwd character varying(512),
 	is_mfa_enabled boolean DEFAULT false NOT NULL,
+	login_type character varying(100), -- uname-pwd | google | facebook | apple
 	mfa_url character varying(2048),
 	mfa_cookies character varying,
 	login_url character varying(2048),
 	login_cookies character varying,
-	UNIQUE(data_platform_id, applicant_id),
+	--UNIQUE(data_platform_id, applicant_id),
 	CONSTRAINT pkey_dp_applicant_login_info_id PRIMARY KEY(id),
 	CONSTRAINT fkey_applicant_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id),
 	CONSTRAINT fkey_dp_applicant_login_info_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id),
@@ -208,7 +209,10 @@ VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '3', 'id=login_control_continue', 'click', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', '4', '{"xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]": "1.1.1", "xpath=//h2[text()=\'Confirm that it\'s you\']": "1.1.2"}', 'verify-and-fork', NULL, NULL),
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '1', NULL, 'not-supported', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '1', NULL, 'gmail-login', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '2', NULL, 'save-login-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '3', NULL, 'operation-completed', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', '4', NULL, 'close-window', NULL, NULL),
 
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.1', '1', NULL, 'save-login-session', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.1', '2', NULL, 'operation-completed', NULL, NULL),
