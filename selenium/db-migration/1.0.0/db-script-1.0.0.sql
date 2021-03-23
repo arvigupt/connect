@@ -1,5 +1,6 @@
 
 CREATE SCHEMA IF NOT EXISTS phyllo_schema;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- common tables
 CREATE TABLE IF NOT EXISTS phyllo_schema.common (
@@ -146,7 +147,7 @@ CREATE TABLE IF NOT EXISTS phyllo_schema.dp_applicant_login_info (
 	tenant_id uuid NOT NULL,
 	data_platform_id uuid NOT NULL,
 	applicant_id uuid NOT NULL,
-	username character varying(100) NOT NULL,
+	username character varying(100),
 	pwd character varying(512),
 	is_mfa_enabled boolean DEFAULT false NOT NULL,
 	login_type character varying(100), -- uname-pwd | google | facebook | apple
@@ -198,20 +199,21 @@ INSERT INTO phyllo_schema.data_platform(id, name, url, logo_url, is_oauth_suppor
 INSERT INTO phyllo_schema.dp_login_path(data_platform_id, level, sequence_no, element_identifier, op_name, element_key_name, element_key_value)
 VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 1, NULL, 'navigate-url', 'login-url', 'https://www.upwork.com/ab/account-security/login'),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 2, 'xpath=//a[text()=\'Upwork\']', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 2, 'xpath=//a[text()=''Upwork'']', 'verify', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 3, 'id=login_username', 'fill', 'username', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 4, 'id=login_password_continue', 'click', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 5, '{"id=login_password": "1.1", "id=login_control_submit": "1.2"}', 'verify-and-fork', NULL, NULL),
 
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', 1, 'id=login_password', 'fill', 'password', NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', 2, 'xpath=//input[@id=\'login_rememberme\']/following-sibling::span', 'check', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', 2, 'xpath=//input[@id=''login_rememberme'']/following-sibling::span', 'check', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', 3, 'id=login_control_continue', 'click', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', 4, '{"xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]": "1.1.1", "xpath=//h2[text()=\'Confirm that it\'s you\']": "1.1.2"}', 'verify-and-fork', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1', 4, '{"xpath=//img[contains(@class,''nav-avatar nav-user-avatar'')]": "1.1.1", "xpath=//h2[text()=''Confirm that it''s you'']": "1.1.2"}', 'verify-and-fork', NULL, NULL),
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 1, NULL, 'google-login', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 2, NULL, 'save-login-session', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 3, NULL, 'operation-completed', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 4, NULL, 'close-window', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 1, 'id=login_control_submit', 'click', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 2, NULL, 'google-login', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 3, NULL, 'save-login-session', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 4, NULL, 'operation-completed', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 5, NULL, 'close-window', NULL, NULL),
 
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.1', 1, NULL, 'save-login-session', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.1', 2, NULL, 'operation-completed', NULL, NULL),
@@ -222,11 +224,11 @@ VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.2', 3, NULL, 'close-window', NULL, NULL),
 
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 1, NULL, 'load-mfa-session', 'mfa-url', NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 2, 'xpath=//h2[text()=\'Confirm that it\'s you\']', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 2, 'xpath=//h2[text()=''Confirm that it''s you'']', 'verify', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 3, 'id=login_deviceAuthOtp_otp', 'fill', 'otp', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 4, 'id=login_deviceAuthOtp_remember', 'check', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 5, 'id=login_control_continue', 'click', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 6, 'xpath=//img[contains(@class,\'nav-avatar nav-user-avatar\')]', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 6, 'xpath=//img[contains(@class,''nav-avatar nav-user-avatar'')]', 'verify', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 7, NULL, 'save-login-session', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 8, NULL, 'operation-completed', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 9, NULL, 'close-window', NULL, NULL)
@@ -243,22 +245,26 @@ INSERT INTO phyllo_schema.tenant_credential(tenant_id, api_key, api_secret, sdk_
 ('fc14a17d-0667-4bd6-856e-b4aaec68984c', 'api_key', 'api_secret', 'sdk_token', 'access_token');
 
 
-INSERT INTO phyllo_schema.applicant(tenant_id, applicant_identifier) VALUES
-('fc14a17d-0667-4bd6-856e-b4aaec68984c', '5a3ab477-1be8-4b37-9e61-a51174c40d09');
+INSERT INTO phyllo_schema.applicant(id, tenant_id, applicant_identifier) VALUES
+('c1af9c06-2c9e-4de0-9745-cbf36bc1be0f', 'fc14a17d-0667-4bd6-856e-b4aaec68984c', '5a3ab477-1be8-4b37-9e61-a51174c40d09');
+
+
+INSERT INTO phyllo_schema.dp_applicant_login_info(tenant_id, data_platform_id, applicant_id) VALUES
+('fc14a17d-0667-4bd6-856e-b4aaec68984c', '034181db-f4f9-426b-b9ee-83a66fd42c6d', 'c1af9c06-2c9e-4de0-9745-cbf36bc1be0f');
 
 
 -- udemy
-INSERT INTO phyllo_schema.data_platform('id', 'name', 'url', 'logo_url', 'is_oauth_supported', is_uname_pwd_supported) VALUES
+INSERT INTO phyllo_schema.data_platform(id, name, url, logo_url, is_oauth_supported, is_uname_pwd_supported) VALUES
 ('199a2144-c599-4e06-84f4-d18836127a6b', 'udemy', 'https://www.udemy.com', NULL, true, true) ON CONFLICT DO NOTHING;
 
-INSERT INTO phyllo_schema.dp_login_path('data_platform_id', 'level', 'sequence_no', 'element_identifier', 'op_name', 'element_key_name', 'element_key_value')
+INSERT INTO phyllo_schema.dp_login_path(data_platform_id, level, sequence_no, element_identifier, op_name, element_key_name, element_key_value)
 VALUES
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 1, NULL, 'navigate-url', 'login-url', 'https://www.udemy.com/join/login-popup'),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 2, 'xpath=//a[text()=\'Udemy\']', 'verify', NULL, NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', 2, 'xpath=//a[text()=''Udemy'']', 'verify', NULL, NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 3, 'id=form-item-email', 'fill', 'username', NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 4, 'id=form-item-password', 'fill', 'password', NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 5, 'id=submit-id-submit', 'click', NULL, NULL),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 6, 'xpath=//a[text()=\'Udemy\']', 'verify', NULL, NULL)
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', 6, 'xpath=//a[text()=''Udemy'']', 'verify', NULL, NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 7, NULL, 'save-login-session', NULL, NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 8, NULL, 'operation-completed', NULL, NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 9, NULL, 'close-window', NULL, NULL)
