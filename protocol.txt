@@ -85,4 +85,14 @@
     a.
 
 
+17. google-login
+    a. continue with google login
+
+
+17. facebook-login
+    a. continue with facebook login
+
+
+17. apple-login
+    a. continue with apple login
 
