@@ -8,6 +8,6 @@ options = {
         'save-mfa-session': 'save_mfa_session',
         'save-login-session': 'save_login_session',
         'verify-and-fork': 'verify_and_fork',
-        'gmail-login': 'gmail_login',
+        'google-login': 'gmail_login',
         'operation-completed':'operation_completed'
     }

@@ -2,6 +2,7 @@ import json
 import os
 import pathlib
 import platform
+import time
 
 import core.common.commoncomponent as self
 from core.common.constants import login_operations
@@ -9,7 +10,7 @@ from core.common.models import login_credentails_dto
 from core.common.repository import data_platorm
 from core.common.repository import dp_applicant_login_info
 from core.common.repository import login_path
-from core.common.utils import gmail_login
+from core.common.utils import gmail_login as login
 from core.seleniumcore.pagefactory import seleniumcommon
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
@@ -126,22 +127,22 @@ def verify_and_fork():
     for key, value in jsonvalue.items():
         pagetovalidate = key.split('=', 1)
         try:
-            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((pagetovalidate[0], pagetovalidate[1])))
-            sequences = login_path.fetch_login_path_sequence(data_platform_id, value)
-            break
+            time.sleep(1)
+            if (seleniumcommon.is_element_visible(driver, pagetovalidate[0], pagetovalidate[1])):
+                sequences = login_path.fetch_login_path_sequence(data_platform_id, value)
+                break
         except:
             print("not able to find page, looking for another page")
-        finally:
-            sequence_to_perform(sequences)
+    sequence_to_perform(sequences)
 
 
 def gmail_login():
+    login_credentails_dto.driver = driver
     parent_handle = driver.current_window_handle
     seleniumcommon.handle_window(driver, parent_handle)
-    gmail_login.go_to(driver, data_platform_id, True)
-    result = gmail_login.enter_username_password(username, password)
+    result = login.enter_username_password(login_credentails_dto.username, login_credentails_dto.password)
     if result == True:
-        gmail_login.enter_otp(mintotp.totp('js6aegv5sm5mqw3gguumw3aoue7atphe'))
+        login.enter_otp(mintotp.totp('js6aegv5sm5mqw3gguumw3aoue7atphe'))
     seleniumcommon.handle_window(driver, parent_handle)
 
 def operation_completed():
