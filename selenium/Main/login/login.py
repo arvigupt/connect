@@ -28,7 +28,7 @@ def login_new_login_session_to_application1():
     print(value)
 
 def login_session_new():
-    commoncomponent.login_to_application('upwork')
+    commoncomponent.login_to_application('upwork','amit@finoptis.org','Infy@123..')
 
 
 if __name__ == '__main__':

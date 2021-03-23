@@ -92,16 +92,15 @@ ALTER TABLE phyllo_schema.dp_refresh_token_builder OWNER TO phyllo;
 CREATE TABLE IF NOT EXISTS phyllo_schema.dp_login_path (
 	data_platform_id uuid NOT NULL,
 	level character varying(100) NOT NULL,
-	sequence_no character varying(100) NOT NULL,
+	sequence_no int NOT NULL,
 	element_identifier character varying(500),
 	op_name character varying(50) NOT NULL, 
 	element_key_name character varying(100),
 	element_key_value character varying(2048),
-	UNIQUE(data_platform_id, sequence_no),
 	CONSTRAINT pkey_dp_login_path_id PRIMARY KEY(id),
 	CONSTRAINT fkey_dp_login_path_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id)
 ) INHERITS (phyllo_schema.common);
-ALTER TABLE phyllo_schema.applicants OWNER TO phyllo;
+ALTER TABLE phyllo_schema.dp_login_path OWNER TO phyllo;
 
 
 CREATE TABLE IF NOT EXISTS phyllo_schema.dp_employer_info (
@@ -193,10 +192,10 @@ ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
 
 
 -- upwork
-INSERT INTO phyllo_schema.data_platform('id', 'name', 'url', 'logo_url', 'is_oauth_supported', is_uname_pwd_supported) VALUES
+INSERT INTO phyllo_schema.data_platform(id, name, url, logo_url, is_oauth_supported, is_uname_pwd_supported) VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', 'upwork', 'https://www.upwork.com', NULL, true, true) ON CONFLICT DO NOTHING;
 
-INSERT INTO phyllo_schema.dp_login_path('data_platform_id', 'level', 'sequence_no', 'element_identifier', 'op_name', 'element_key_name', 'element_key_value')
+INSERT INTO phyllo_schema.dp_login_path(data_platform_id, level, sequence_no, element_identifier, op_name, element_key_name, element_key_value)
 VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '1', NULL, 'navigate-url', 'login-url', 'https://www.upwork.com/ab/account-security/login'),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', '2', 'xpath=//a[text()=\'Upwork\']', 'verify', NULL, NULL),
@@ -236,15 +235,15 @@ VALUES
 
 
 
-INSERT INTO phyllo_schema.tenant('id', 'name', 'url', 'logo_url', 'domain_name', 'status') VALUES 
+INSERT INTO phyllo_schema.tenant(id, name, url, logo_url, domain_name, status) VALUES
 ('fc14a17d-0667-4bd6-856e-b4aaec68984c', 'phyllo', 'https://getphyllo.com', NULL, 'getphyllo.com', 'ACTIVATED');
 
 
-INSERT INTO phyllo_schema.tenant_credential('tenant_id', 'api_key', 'api_secret', 'sdk_token', 'access_token') VALUES 
+INSERT INTO phyllo_schema.tenant_credential(tenant_id, api_key, api_secret, sdk_token, access_token) VALUES
 ('fc14a17d-0667-4bd6-856e-b4aaec68984c', 'api_key', 'api_secret', 'sdk_token', 'access_token');
 
 
-INSERT INTO phyllo_schema.applicant('tenant_id', 'applicant_identifier') VALUES 
+INSERT INTO phyllo_schema.applicant(tenant_id, applicant_identifier) VALUES
 ('fc14a17d-0667-4bd6-856e-b4aaec68984c', '5a3ab477-1be8-4b37-9e61-a51174c40d09');
 
 
