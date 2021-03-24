@@ -191,11 +191,11 @@ CREATE TABLE IF NOT EXISTS phyllo_schema.applicant_doc_info (
 ALTER TABLE phyllo_schema.dp_applicant_login_info OWNER TO phyllo;
 
 
-
 -- upwork
 INSERT INTO phyllo_schema.data_platform(id, name, url, logo_url, is_oauth_supported, is_uname_pwd_supported) VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', 'upwork', 'https://www.upwork.com', NULL, true, true) ON CONFLICT DO NOTHING;
 
+-- upwork login path
 INSERT INTO phyllo_schema.dp_login_path(data_platform_id, level, sequence_no, element_identifier, op_name, element_key_name, element_key_value)
 VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 1, NULL, 'navigate-url', 'login-url', 'https://www.upwork.com/ab/account-security/login'),
@@ -232,9 +232,7 @@ VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 7, NULL, 'save-login-session', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 8, NULL, 'operation-completed', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 9, NULL, 'close-window', NULL, NULL)
-
  ON CONFLICT DO NOTHING;
-
 
 
 INSERT INTO phyllo_schema.tenant(id, name, url, logo_url, domain_name, status) VALUES
@@ -257,6 +255,7 @@ INSERT INTO phyllo_schema.dp_applicant_login_info(tenant_id, data_platform_id, a
 INSERT INTO phyllo_schema.data_platform(id, name, url, logo_url, is_oauth_supported, is_uname_pwd_supported) VALUES
 ('199a2144-c599-4e06-84f4-d18836127a6b', 'udemy', 'https://www.udemy.com', NULL, true, true) ON CONFLICT DO NOTHING;
 
+-- udemy login path
 INSERT INTO phyllo_schema.dp_login_path(data_platform_id, level, sequence_no, element_identifier, op_name, element_key_name, element_key_value)
 VALUES
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 1, NULL, 'navigate-url', 'login-url', 'https://www.udemy.com/join/login-popup'),
@@ -268,7 +267,35 @@ VALUES
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 7, NULL, 'save-login-session', NULL, NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 8, NULL, 'operation-completed', NULL, NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 9, NULL, 'close-window', NULL, NULL)
-
 ON CONFLICT DO NOTHING;
 
+
+-- slack
+INSERT INTO phyllo_schema.data_platform(id, name, url, logo_url, is_oauth_supported, is_uname_pwd_supported) VALUES
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', 'slack', 'https://phyllo.slack.com', NULL, true, true) ON CONFLICT DO NOTHING;
+
+-- slack login path
+INSERT INTO phyllo_schema.dp_login_path(data_platform_id, level, sequence_no, element_identifier, op_name, element_key_name, element_key_value)
+VALUES
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1', 1, NULL, 'navigate-url', 'login-url', 'https://phyllo.slack.com/'),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1', 2, 'id=email', 'fill', 'username', NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1', 3, 'id=password', 'fill', 'password', NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1', 4, 'id=signin_btn', 'click', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 5, '{"xpath=//*[@id="page_contents"]/div/div/div[2]/h1]": "1.1", "xpath=//*[@id="page_contents"]/div/div[2]/form/div/input": "1.2"}', 'verify-and-fork', NULL, NULL),
+
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.1', 1, NULL, 'save-login-session', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.1', 2, NULL, 'operation-completed', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.1', 3, NULL, 'close-window', NULL, NULL),
+
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.2', 1, NULL, 'save-mfa-session', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.2', 2, NULL, 'operation-in-progress', 'resume-from', '2'),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.2', 3, NULL, 'close-window', NULL, NULL),
+
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 1, 'xpath=//*[@id="page_contents"]/div/div[2]/form/div/input', 'fill', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 2, 'id=signin_btn', 'click', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 3, 'xpath=//*[@id="page_contents"]/div/div/div[2]/h1]', 'verify', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 4, NULL, 'save-login-session', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 5, NULL, 'operation-completed', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 6, NULL, 'close-window', NULL, NULL)
+ON CONFLICT DO NOTHING;
 

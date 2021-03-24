@@ -1,16 +1,10 @@
 from core.common import commoncomponent
 
-#direct upwork account
-# def login_session_new():
-#     commoncomponent.login_to_application('upwork','amit@finoptis.org','Infy@123..')
-
-#gmail account with OTP
 def login_session_new():
-    commoncomponent.login_to_application('upwork','phyllouser@gmail.com','phyllo@123')
-
-#gmail account with OTP not enabled
-# def login_session_new():
-#     commoncomponent.login_to_application('upwork','phyllouser1@gmail.com','phyllo@123')
+    dp_name = input("Enter data platform name: ")
+    applicant_username = input("Enter username: ")
+    applicant_pwd = input("Enter password: ")
+    commoncomponent.login_to_application(dp_name, applicant_username, applicant_pwd)
 
 if __name__ == '__main__':
     login_session_new()
