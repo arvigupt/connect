@@ -3,6 +3,7 @@ import os
 import pathlib
 import platform
 import time
+import mintotp
 
 import core.common.commoncomponent as self
 from core.common.constants import login_operations
@@ -15,6 +16,8 @@ from core.seleniumcore.pagefactory import seleniumcommon
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.options import Options
+from fake_useragent import UserAgent
 
 
 def add_drivers_to_path():
@@ -38,6 +41,7 @@ def login_to_application(applicationname, username, password):
     login_credentails_dto.password = password
     global data_platform_id
     data_platform_id = data_platorm.fetch_dataplatform_id(applicationname)
+    login_credentails_dto.data_platform_id = data_platform_id
     sequences = login_path.fetch_login_path_sequence(data_platform_id, 1)
     sequence_to_perform(sequences)
 
@@ -52,7 +56,40 @@ def navigate_url():
     global driver
     global url
     add_drivers_to_path()
+    chrome_options = Options()
+    # chrome_options.add_argument("--disable-extensions")
+    # chrome_options.add_argument("--disable-popup-blocking")
+    # chrome_options.add_argument("--profile-directory=Default")
+    # chrome_options.add_argument("--ignore-certificate-errors")
+    # chrome_options.add_argument("--disable-plugins-discovery")
+    # #chrome_options.add_argument("--incognito")
+    # chrome_options.add_argument("--lang=en-us")
+    # chrome_options.add_argument("--disable-web-security")
+    # chrome_options.add_argument("--allow-running-insecure-content")
+    # chrome_options.add_argument("user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:46.0) Gecko/20100101 Firefox/46.0'")
+    # chrome_options.add_argument("start-maximized")
+    # chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    # chrome_options.add_experimental_option('useAutomationExtension', False)
+    # chrome_options.add_argument("--remote-debugging-port=9222")
+    # chrome_options.add_argument("--disable-web-security")
+    # chrome_options.add_argument("--allow-running-insecure-content")
+    # chrome_options.add_argument("--enable-experimental-cookie-features")
+    #chrome_options.add_experimental_option("excludeSwitches", ["disable-popup-blocking"])
+
+    # chrome_options.add_experimental_option("prefs", {"profile.block_third_party_cookies": False});
+    # ua = UserAgent()
+    # userAgent = ua.random
+    # print(userAgent)
+    # chrome_options.add_argument(f'user-agent={userAgent}')
+    # chrome_options.add_experimental_option("excludeSwitches",
+    #                                 ["ignore-certificate-errors", "safebrowsing-disable-download-protection",
+    #                                  "safebrowsing-disable-auto-update", "disable-client-side-phishing-detection"])
+    # driver = webdriver.Chrome(chrome_options=chrome_options)
+    # driver.execute_cdp_cmd('Network.setUserAgentOverride', {
+    #     "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'})
+    # print(driver.execute_script("return navigator.userAgent;"))
     driver = webdriver.Chrome()
+    #driver = webdriver.Firefox()
     driver.implicitly_wait(5)
     if operation['element_key_name'] == 'mfa-url' or operation['element_key_name'] == 're-login-url':
         driver.execute_cdp_cmd('Network.enable', {})
@@ -113,6 +150,8 @@ def save_mfa_session():
     print("Current to URL: {}".format(url))
     otpcookies = driver.get_cookies()
     dp_applicant_login_info.update_mfa_cookies(url, data_platform_id)
+    login_credentails_dto.temp_currenturl=url
+    login_credentails_dto.temp_otpcookies=otpcookies
 
 
 def save_login_session():
@@ -126,24 +165,30 @@ def verify_and_fork():
     jsonvalue = json.loads(operation['element_identifier'])
     for key, value in jsonvalue.items():
         pagetovalidate = key.split('=', 1)
-        try:
-            time.sleep(1)
-            if (seleniumcommon.is_element_visible(driver, pagetovalidate[0], pagetovalidate[1])):
-                sequences = login_path.fetch_login_path_sequence(data_platform_id, value)
-                break
-        except:
+        time.sleep(5)
+        if (seleniumcommon.is_element_visible(driver, pagetovalidate[0], pagetovalidate[1])):
+            sequences = login_path.fetch_login_path_sequence(data_platform_id, value)
+            sequence_to_perform(sequences)
+        else:
             print("not able to find page, looking for another page")
-    sequence_to_perform(sequences)
-
 
 def gmail_login():
     login_credentails_dto.driver = driver
+    handles = driver.window_handles
+    size = len(handles)
     parent_handle = driver.current_window_handle
-    seleniumcommon.handle_window(driver, parent_handle)
-    result = login.enter_username_password(login_credentails_dto.username, login_credentails_dto.password)
-    if result == True:
-        login.enter_otp(mintotp.totp('js6aegv5sm5mqw3gguumw3aoue7atphe'))
-    seleniumcommon.handle_window(driver, parent_handle)
+    for x in range(size):
+        if handles[x] != parent_handle:
+            driver.switch_to.window(handles[x])
+            result = login.enter_username_password(login_credentails_dto.username, login_credentails_dto.password)
+            if result == True:
+                login.enter_otp(mintotp.totp('6wtgspfm3uls3nrrdz7ssmqcsuqldwu2'))
+            time.sleep(7)
+            driver.quit()
+            break
+
+    driver.switch_to.window(parent_handle)
+
 
 def operation_completed():
     print("All operation completed => Enjoy")
