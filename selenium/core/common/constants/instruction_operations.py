@@ -4,10 +4,18 @@ options = {
         'fill': 'fill',
         'click': 'click',
         'check': 'check',
+        'uncheck': 'uncheck',
+        'fetch': 'fetch',
         'close-window': 'close_window',
         'save-mfa-session': 'save_mfa_session',
         'save-login-session': 'save_login_session',
+        'load-mfa-session': 'load_mfa_session',
+        'load-login-session': 'load_login_session',
         'verify-and-fork': 'verify_and_fork',
-        'google-login': 'gmail_login',
-        'operation-completed':'operation_completed'
-    }
+        'google-login': 'google_login',
+        'facebook-login': 'facebook_login',
+        'apple-login': 'apple_login',
+        'operation-completed':'operation_completed',
+        'operation-in-progress':'operation_in_progress',
+        'not-supported':'not_supported'
+}

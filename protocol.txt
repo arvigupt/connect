@@ -46,7 +46,7 @@
 	a. save login session in the database. login session includes url and cookies
 
 
-9. close-browser
+9. close-window
 	a. close the browser window
 
 

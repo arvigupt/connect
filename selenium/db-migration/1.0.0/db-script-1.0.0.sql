@@ -291,11 +291,12 @@ VALUES
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.2', 2, NULL, 'operation-in-progress', 'resume-from', '2'),
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.2', 3, NULL, 'close-window', NULL, NULL),
 
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 1, 'xpath=//*[@id="page_contents"]/div/div[2]/form/div/input', 'fill', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 2, 'id=signin_btn', 'click', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 3, 'xpath=//*[@id="page_contents"]/div/div/div[2]/h1]', 'verify', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 4, NULL, 'save-login-session', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 5, NULL, 'operation-completed', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 6, NULL, 'close-window', NULL, NULL)
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 1, NULL, 'load-mfa-session', 'mfa-url', NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 2, 'xpath=//*[@id="page_contents"]/div/div[2]/form/div/input', 'fill', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 3, 'id=signin_btn', 'click', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 4, 'xpath=//*[@id="page_contents"]/div/div/div[2]/h1]', 'verify', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 5, NULL, 'save-login-session', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 6, NULL, 'operation-completed', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 7, NULL, 'close-window', NULL, NULL)
 ON CONFLICT DO NOTHING;
 

@@ -3,5 +3,5 @@ password = ''
 otp = ''
 driver = None
 data_platform_id = None
-temp_otpcookies = None
-temp_currenturl = None
+temp_mfa_cookies = None
+temp_current_url = None

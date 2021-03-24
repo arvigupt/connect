@@ -17,7 +17,7 @@ def connect():
 
 def execute_select(sql):
     try:
-        with connect().cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
+        with connect().cursor(cursor_factory = psycopg2.extras.DictCursor) as cur:
             cur.execute(sql)
             rs_dict = cur.fetchall()
     except Exception as e:
