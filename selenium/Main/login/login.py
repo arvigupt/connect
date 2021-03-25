@@ -7,12 +7,11 @@ login_status = 'login_status'
 def start_login():
     tenant_id = 'fc14a17d-0667-4bd6-856e-b4aaec68984c'
     applicant_id = 'c1af9c06-2c9e-4de0-9745-cbf36bc1be0f'
-    dp_name = "slack"
-    # dp_name = input("Enter data platform name: ")
+    dp_name = input("Enter data platform name: ")
     data_platform_id = data_platform.fetch_data_platform_id(dp_name)
     applicant_login_info = dp_applicant_login_info.fetch_dp_applicant_login_info(tenant_id, data_platform_id, applicant_id)
-    applicant_username = "mohit@getphyllo.com"
-    applicant_pwd = "Siso@123"
+    applicant_username = ""
+    applicant_pwd = ""
     applicant_otp = ""
 
     if applicant_login_info == None:
