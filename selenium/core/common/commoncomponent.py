@@ -125,7 +125,7 @@ def verify(tenant_id, applicant_id, instruction):
     element_to_validate = instruction[element_identifier].split('=', 1)
     WebDriverWait(driver, element_wait_timeout).until(
         EC.presence_of_element_located((element_to_validate[0], element_to_validate[1])))
-    return "Verifying element complete for " + element_to_validate
+    return "Verifying element complete for " + str(element_to_validate)
 
 
 def fill(tenant_id, applicant_id, instruction):
@@ -279,7 +279,10 @@ def apple_login(tenant_id, applicant_id, instruction):
 
 def operation_completed(tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
-    print("All operation completed => Enjoy")
+    applicant_login_info = dp_applicant_login_info.update_login_status(tenant_id, instruction[data_platform_id],
+                                                                       applicant_id, 'uname-pwd', 'completed')
+    applicant_login_info = dp_applicant_login_info.update_resume_from(tenant_id, instruction[data_platform_id],
+                                                                       applicant_id, '')
 
 
 def operation_in_progress(tenant_id, applicant_id, instruction):

@@ -30,7 +30,7 @@ def update_mfa_cookies(tenant_id, data_platform_id, applicant_id, url, cookies):
 def update_login_cookies(tenant_id, data_platform_id, applicant_id, url, cookies):
     temp_cookies = str(cookies)
     temp_cookies = temp_cookies.replace("'", "''")
-    sql = "UPDATE phyllo_schema.dp_applicant_login_info SET login_url = E'{}', login_cookies = E'{}' WHERE tenant_id = '{}' AND " \
+    sql = "UPDATE phyllo_schema.dp_applicant_login_info SET login_url = '{}', login_cookies = '{}' WHERE tenant_id = '{}' AND " \
           "data_platform_id = '{}' AND applicant_id = '{}'".format(
         url, temp_cookies, tenant_id, data_platform_id, applicant_id)
     dbhelper.execute_update(sql)
