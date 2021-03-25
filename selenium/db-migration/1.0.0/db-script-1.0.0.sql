@@ -155,8 +155,8 @@ CREATE TABLE IF NOT EXISTS phyllo_schema.dp_applicant_login_info (
 	mfa_cookies character varying,
 	login_url character varying(2048),
 	login_cookies character varying,
-	login_status character varying(100) -- none | in-progress | completed
-	resume_from character varying(100)
+	login_status character varying(100), -- none | in-progress | completed
+	resume_from character varying(100),
 	--UNIQUE(data_platform_id, applicant_id),
 	CONSTRAINT pkey_dp_applicant_login_info_id PRIMARY KEY(id),
 	CONSTRAINT fkey_applicant_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id),
