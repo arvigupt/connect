@@ -25,6 +25,17 @@ def execute_select(sql):
 
     return rs_dict
 
+def execute_insert(sql):
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        cur.execute(sql)
+        conn.commit()
+        cur.close()
+    except Exception as e:
+        raise Exception("Failed running sql {}. Error: {}".format(sql, str(e)))
+
+
 def execute_update(sql):
     try:
         conn = connect()

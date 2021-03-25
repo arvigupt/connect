@@ -155,6 +155,8 @@ CREATE TABLE IF NOT EXISTS phyllo_schema.dp_applicant_login_info (
 	mfa_cookies character varying,
 	login_url character varying(2048),
 	login_cookies character varying,
+	login_status character varying(100) -- none | in-progress | completed
+	resume_from character varying(100)
 	--UNIQUE(data_platform_id, applicant_id),
 	CONSTRAINT pkey_dp_applicant_login_info_id PRIMARY KEY(id),
 	CONSTRAINT fkey_applicant_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id),
@@ -223,7 +225,7 @@ VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.2', 2, NULL, 'operation-in-progress', 'resume-from', '2'),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.2', 3, NULL, 'close-window', NULL, NULL),
 
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 1, NULL, 'load-mfa-session', 'mfa-url', NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 1, NULL, 'load-mfa-session', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 2, 'xpath=//h2[text()=''Confirm that it''s you'']', 'verify', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 3, 'id=login_deviceAuthOtp_otp', 'fill', 'otp', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 4, 'id=login_deviceAuthOtp_remember', 'check', NULL, NULL),
@@ -245,10 +247,6 @@ INSERT INTO phyllo_schema.tenant_credential(tenant_id, api_key, api_secret, sdk_
 
 INSERT INTO phyllo_schema.applicant(id, tenant_id, applicant_identifier) VALUES
 ('c1af9c06-2c9e-4de0-9745-cbf36bc1be0f', 'fc14a17d-0667-4bd6-856e-b4aaec68984c', '5a3ab477-1be8-4b37-9e61-a51174c40d09');
-
-
-INSERT INTO phyllo_schema.dp_applicant_login_info(tenant_id, data_platform_id, applicant_id) VALUES
-('fc14a17d-0667-4bd6-856e-b4aaec68984c', '034181db-f4f9-426b-b9ee-83a66fd42c6d', 'c1af9c06-2c9e-4de0-9745-cbf36bc1be0f');
 
 
 -- udemy
@@ -281,7 +279,7 @@ VALUES
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1', 2, 'id=email', 'fill', 'username', NULL),
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1', 3, 'id=password', 'fill', 'password', NULL),
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1', 4, 'id=signin_btn', 'click', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 5, '{"xpath=//*[@id="page_contents"]/div/div/div[2]/h1]": "1.1", "xpath=//*[@id="page_contents"]/div/div[2]/form/div/input": "1.2"}', 'verify-and-fork', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1', 5, '{"xpath=//*[@id=''page_contents'']/div/div/div[2]/h1]": "1.1", "xpath=//*[@id=''page_contents'']/div/div[2]/form/div/input": "1.2"}', 'verify-and-fork', NULL, NULL),
 
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.1', 1, NULL, 'save-login-session', NULL, NULL),
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.1', 2, NULL, 'operation-completed', NULL, NULL),
@@ -291,10 +289,10 @@ VALUES
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.2', 2, NULL, 'operation-in-progress', 'resume-from', '2'),
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.2', 3, NULL, 'close-window', NULL, NULL),
 
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 1, NULL, 'load-mfa-session', 'mfa-url', NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 2, 'xpath=//*[@id="page_contents"]/div/div[2]/form/div/input', 'fill', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 1, NULL, 'load-mfa-session', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 2, 'xpath=//*[@id=''page_contents'']/div/div[2]/form/div/input', 'fill', 'otp', NULL),
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 3, 'id=signin_btn', 'click', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 4, 'xpath=//*[@id="page_contents"]/div/div/div[2]/h1]', 'verify', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 4, 'xpath=//*[@id=''page_contents'']/div/div/div[2]/h1]', 'verify', NULL, NULL),
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 5, NULL, 'save-login-session', NULL, NULL),
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 6, NULL, 'operation-completed', NULL, NULL),
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 7, NULL, 'close-window', NULL, NULL)

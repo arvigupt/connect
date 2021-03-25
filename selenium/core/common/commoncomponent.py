@@ -25,6 +25,7 @@ element_key_name = 'element_key_name'
 element_key_value = 'element_key_value'
 element_identifier = 'element_identifier'
 op_name = 'op_name'
+data_platform_id = 'data_platform_id'
 
 
 def add_drivers_to_path():
@@ -44,22 +45,29 @@ def add_drivers_to_path():
     os.environ[path_constant] = new_path
 
 
-def login_to_application(data_platform_name, username, password):
+def login_to_application(tenant_id, data_platform_id, applicant_id, username, password, otp, dp_applicant_login_info):
     login_credentails_dto.username = username
     login_credentails_dto.password = password
-    data_platform_id = data_platorm.fetch_dataplatform_id(data_platform_name)
+    login_credentails_dto.otp = otp
+    login_credentails_dto.tenant_id = tenant_id
     login_credentails_dto.data_platform_id = data_platform_id
+    login_credentails_dto.applicant_id = applicant_id
+
     # always start from level 1, when login starts
-    instructions = login_path.fetch_login_path_instructions(data_platform_id, 1)
-    instructions_to_perform(data_platform_id, instructions)
+    level = 1;
+    if dp_applicant_login_info['login_status'] == "in-progress":
+        level = dp_applicant_login_info['resume_from']
+    instructions = login_path.fetch_login_path_instructions(data_platform_id, level)
+    instructions_to_perform(tenant_id, data_platform_id, applicant_id, instructions)
 
 
-def instructions_to_perform(data_platform_id, instructions):
+def instructions_to_perform(tenant_id, data_platform_id, applicant_id, instructions):
     for instruction in instructions:
-        getattr(self, instruction_operations.options[instruction[op_name]])(instruction)
+        getattr(self, instruction_operations.options[instruction[op_name]])(tenant_id, applicant_id, instruction)
 
 
-def navigate_url(instruction):
+def navigate_url(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     add_drivers_to_path()
     chrome_options = Options()
     # chrome_options.add_argument("--disable-extensions")
@@ -93,29 +101,25 @@ def navigate_url(instruction):
     # driver.execute_cdp_cmd('Network.setUserAgentOverride', {
     #     "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'})
     # print(driver.execute_script("return navigator.userAgent;"))
-    url = ""
+    global driver
     driver = webdriver.Chrome()
     #driver = webdriver.Firefox()
     driver.implicitly_wait(5)
-    if instruction[element_key_name] == 'mfa-url' or instruction[element_key_name] == 'login-url':
-        driver.execute_cdp_cmd('Network.enable', {})
-        for mfa_cookie in mfa_cookies:
-            driver.execute_cdp_cmd('Network.setCookie', mfa_cookie)
-        driver.execute_cdp_cmd('Network.disable', {})
-    else:
-        url = instruction[element_key_value]
+    url = instruction[element_key_value]
     print("Navigating to URL: {}".format(url))
     driver.get(url);
 
 
-def verify(instruction):
+def verify(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     element_to_validate = instruction[element_identifier].split('=', 1)
     WebDriverWait(driver, element_wait_timeout).until(
         EC.presence_of_element_located((element_to_validate[0], element_to_validate[1])))
     return "Verifying element complete for " + element_to_validate
 
 
-def fill(instruction):
+def fill(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     type_and_value = instruction[element_identifier].split('=', 1)
     if (instruction[element_key_value] is None):
         if (instruction[element_key_name] == 'username'):
@@ -123,24 +127,33 @@ def fill(instruction):
                 EC.element_to_be_clickable((type_and_value[0], type_and_value[1])))
             seleniumcommon.type_into_element(driver, login_credentails_dto.username,
                                              type_and_value[0], type_and_value[1])
-            dp_applicant_login_info.update_username(login_credentails_dto.username, data_platform_id)
+            dp_applicant_login_info.update_username(login_credentails_dto.username, instruction[data_platform_id])
+
         if (instruction[element_key_name] == 'password'):
             WebDriverWait(driver, element_wait_timeout).until(
                 EC.element_to_be_clickable((type_and_value[0], type_and_value[1])))
             seleniumcommon.type_into_element(driver, login_credentails_dto.password,
                                              type_and_value[0], type_and_value[1])
-            dp_applicant_login_info.update_password(login_credentails_dto.password, data_platform_id)
+            dp_applicant_login_info.update_password(login_credentails_dto.password, instruction[data_platform_id])
+
+        if (instruction[element_key_name] == 'otp'):
+            WebDriverWait(driver, element_wait_timeout).until(
+                EC.element_to_be_clickable((type_and_value[0], type_and_value[1])))
+            seleniumcommon.type_into_element(driver, login_credentails_dto.otp,
+                                             type_and_value[0], type_and_value[1])
     else:
         seleniumcommon.type_into_element(driver, instruction[element_key_value],
                                          type_and_value[0], type_and_value[1])
 
 
-def click(instruction):
+def click(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     type_and_value = instruction[element_identifier].split('=', 1)
     seleniumcommon.click(driver, type_and_value[0], type_and_value[1])
 
 
-def check(instruction):
+def check(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     type_and_value = instruction[element_identifier].split('=', 1)
     WebDriverWait(driver, element_wait_timeout).until(
         EC.presence_of_element_located((type_and_value[0], type_and_value[1])))
@@ -148,7 +161,8 @@ def check(instruction):
         seleniumcommon.click(driver, type_and_value[0], type_and_value[1])
 
 
-def uncheck(instruction):
+def uncheck(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     type_and_value = instruction[element_identifier].split('=', 1)
     WebDriverWait(driver, element_wait_timeout).until(
         EC.presence_of_element_located((type_and_value[0], type_and_value[1])))
@@ -156,51 +170,72 @@ def uncheck(instruction):
         seleniumcommon.click(driver, type_and_value[0], type_and_value[1])
 
 
-def fetch(instruction):
+def fetch(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     print("fetch TBD")
 
 
-def close_window(instruction):
+def close_window(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     seleniumcommon.stopdriver(driver)
 
 
-def save_mfa_session(instruction):
+def save_mfa_session(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     mfa_url = driver.current_url
-    print("MFA URL: {}".format(mfa_url))
     mfa_cookies = driver.get_cookies()
-    dp_applicant_login_info.update_mfa_cookies(mfa_url, data_platform_id)
-    login_credentails_dto.temp_current_url = mfa_url
-    login_credentails_dto.temp_mfa_cookies = mfa_cookies
+    dp_applicant_login_info.update_mfa_cookies(tenant_id, instruction[data_platform_id], applicant_id,  mfa_url, mfa_cookies)
 
 
-def save_login_session(instruction):
+def save_login_session(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     login_url = driver.current_url
-    print("Login URL: {}".format(login_url))
     login_cookies = driver.get_cookies()
-    dp_applicant_login_info.update_login_cookies(login_url, data_platform_id)
+    dp_applicant_login_info.update_login_cookies(tenant_id, instruction[data_platform_id], applicant_id, login_url,
+                                               login_cookies)
 
 
-def load_mfa_session(instruction):
-    print("load_mfa_session TBD")
+def load_mfa_session(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
+    dp_applicant_login_info.fetch_dp_applicant_login_info(tenant_id, data_platform_id, applicant_id)
+    mfa_cookies = dp_applicant_login_info['mfa_cookies']
+    mfa_url = dp_applicant_login_info['mfa_url']
+    driver.execute_cdp_cmd('Network.enable', {})
+    for mfa_cookie in mfa_cookies:
+        driver.execute_cdp_cmd('Network.setCookie', mfa_cookie)
+    driver.execute_cdp_cmd('Network.disable', {})
+    print("Navigating to URL: {}".format(mfa_url))
+    driver.get(mfa_url);
 
 
-def load_login_session(instruction):
-    print("load_login_session TBD")
+def load_login_session(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
+    dp_applicant_login_info.fetch_dp_applicant_login_info(tenant_id, data_platform_id, applicant_id)
+    login_cookies = dp_applicant_login_info['login_cookies']
+    login_url = dp_applicant_login_info['login_url']
+    driver.execute_cdp_cmd('Network.enable', {})
+    for login_cookie in login_cookies:
+        driver.execute_cdp_cmd('Network.setCookie', login_cookie)
+    driver.execute_cdp_cmd('Network.disable', {})
+    print("Navigating to URL: {}".format(login_url))
+    driver.get(login_url);
 
 
-def verify_and_fork(instruction):
-    jsonvalue = json.loads(instruction[element_identifier])
-    for key, value in jsonvalue.items():
+def verify_and_fork(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
+    json_value = json.loads(instruction[element_identifier])
+    for key, value in json_value.items():
         element_to_verify = key.split('=', 1)
         time.sleep(5)
         if (seleniumcommon.is_element_visible(driver, element_to_verify[0], element_to_verify[1])):
-            instructions = login_path.fetch_login_path_instructions(data_platform_id, value)
-            instructions_to_perform(data_platform_id, instructions)
+            instructions = login_path.fetch_login_path_instructions(instruction[data_platform_id], value)
+            instructions_to_perform(instruction[data_platform_id], instructions)
         else:
             print("not able to find element, looking for another element")
 
 
-def google_login(instruction):
+def google_login(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     login_credentails_dto.driver = driver
     handles = driver.window_handles
     size = len(handles)
@@ -218,21 +253,26 @@ def google_login(instruction):
     driver.switch_to.window(parent_handle)
 
 
-def facebook_login(instruction):
+def facebook_login(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     print("facebook_login TBD")
 
 
-def apple_login(instruction):
+def apple_login(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     print("apple_login TBD")
 
 
-def operation_completed(instruction):
+def operation_completed(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     print("All operation completed => Enjoy")
 
 
-def operation_in_progress(instruction):
+def operation_in_progress(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     print("operation_in_progress TBD")
 
 
-def not_supported(instruction):
+def not_supported(tenant_id, applicant_id, instruction):
+    print("Executing instruction {}".format(instruction))
     print("not_supported TBD")
