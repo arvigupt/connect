@@ -24,6 +24,8 @@ def start_login():
         applicant_username = input("Enter username: ")
         applicant_pwd = input("Enter password: ")
     elif applicant_login_info[login_status] == "in-progress" :
+        applicant_username = applicant_login_info['username']
+        applicant_pwd = applicant_login_info['pwd']
         applicant_otp = input("Enter OTP: ")
     elif applicant_login_info[login_status] == "completed":
         option = input("Previous login operation is completed. Do you want to start again (Y/N): ")

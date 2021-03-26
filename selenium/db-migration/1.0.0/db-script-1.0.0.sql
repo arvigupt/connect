@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS phyllo_schema.dp_applicant_login_info (
 	applicant_id uuid NOT NULL,
 	username character varying(100),
 	pwd character varying(512),
-	is_mfa_enabled boolean DEFAULT false NOT NULL,
+	is_mfa_enabled Boolean DEFAULT false NOT NULL,
 	login_type character varying(100), -- uname-pwd | google | facebook | apple
 	mfa_url character varying(2048),
 	mfa_cookies character varying,
@@ -290,11 +290,15 @@ VALUES
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.2', 3, NULL, 'close-window', NULL, NULL),
 
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 1, NULL, 'load-mfa-session', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 2, 'xpath=//*[@id=''page_contents'']/div/div[2]/form/div/input', 'fill', 'otp', NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 3, 'id=signin_btn', 'click', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 4, 'xpath=//*[@id=''page_contents'']/div/div/div[2]/h1]', 'verify', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 5, NULL, 'save-login-session', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 6, NULL, 'operation-completed', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 7, NULL, 'close-window', NULL, NULL)
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 2, 'id=email', 'fill', 'username', NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 3, 'id=password', 'fill', 'password', NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 4, 'id=signin_btn', 'click', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 5, 'xpath=//*[@id=''page_contents'']/div/div[2]/form/div/input', 'fill', 'otp', NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 6, 'id=signin_btn', 'click', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 7, 'xpath=//*[@id=''page_contents'']/div/div/div[2]/h1]', 'verify', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 8, NULL, 'save-login-session', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 9, NULL, 'operation-completed', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 10, NULL, 'close-window', NULL, NULL)
 ON CONFLICT DO NOTHING;
 
+//*[@id="page_contents"]/div/div/div[2]/h1

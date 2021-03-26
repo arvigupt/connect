@@ -137,7 +137,7 @@ def fill(tenant_id, applicant_id, instruction):
                 EC.element_to_be_clickable((type_and_value[0], type_and_value[1])))
             seleniumcommon.type_into_element(driver, login_credentails_dto.username,
                                              type_and_value[0], type_and_value[1])
-            dp_applicant_login_info.update_username(tenant_id, instruction[data_platform_id], applicant_id, login_credentails_dto.username, )
+            dp_applicant_login_info.update_username(tenant_id, instruction[data_platform_id], applicant_id, login_credentails_dto.username)
 
         if (instruction[element_key_name] == 'password'):
             WebDriverWait(driver, element_wait_timeout).until(
@@ -195,6 +195,7 @@ def save_mfa_session(tenant_id, applicant_id, instruction):
     url = driver.current_url
     cookies = driver.get_cookies()
     dp_applicant_login_info.update_mfa_cookies(tenant_id, instruction[data_platform_id], applicant_id,  url, cookies)
+    dp_applicant_login_info.update_mfa_info(tenant_id, instruction[data_platform_id], applicant_id, True)
 
 
 def save_login_session(tenant_id, applicant_id, instruction):

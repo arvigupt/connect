@@ -36,13 +36,13 @@ def update_login_cookies(tenant_id, data_platform_id, applicant_id, url, cookies
     dbhelper.execute_update(sql)
 
 def update_username(tenant_id, data_platform_id, applicant_id, username):
-    sql = "UPDATE phyllo_schema.dp_applicant_login_info SET username = E'{}' WHERE tenant_id = '{}' AND " \
+    sql = "UPDATE phyllo_schema.dp_applicant_login_info SET username = '{}' WHERE tenant_id = '{}' AND " \
           "data_platform_id = '{}' AND applicant_id = '{}'".format(
         username, tenant_id, data_platform_id, applicant_id)
     dbhelper.execute_update(sql)
 
 def update_password(tenant_id, data_platform_id, applicant_id, password):
-    sql = "UPDATE phyllo_schema.dp_applicant_login_info SET pwd = E'{}' WHERE tenant_id = '{}' AND " \
+    sql = "UPDATE phyllo_schema.dp_applicant_login_info SET pwd = '{}' WHERE tenant_id = '{}' AND " \
           "data_platform_id = '{}' AND applicant_id = '{}'".format(
         password, tenant_id, data_platform_id, applicant_id)
     dbhelper.execute_update(sql)
@@ -57,4 +57,13 @@ def update_resume_from(tenant_id, data_platform_id, applicant_id, resume_from):
     sql = "UPDATE phyllo_schema.dp_applicant_login_info SET resume_from = '{}' WHERE tenant_id = '{}' AND " \
           "data_platform_id = '{}' AND applicant_id = '{}'".format(
         resume_from, tenant_id, data_platform_id, applicant_id)
+    dbhelper.execute_update(sql)
+
+def update_mfa_info(tenant_id, data_platform_id, applicant_id, is_mfa_enabled):
+    if is_mfa_enabled == True:
+        sql = "UPDATE phyllo_schema.dp_applicant_login_info SET is_mfa_enabled = 't' WHERE tenant_id = '{}' AND " \
+              "data_platform_id = '{}' AND applicant_id = '{}'".format(tenant_id, data_platform_id, applicant_id)
+    else:
+        sql = "UPDATE phyllo_schema.dp_applicant_login_info SET is_mfa_enabled = 'f' WHERE tenant_id = '{}' AND " \
+              "data_platform_id = '{}' AND applicant_id = '{}'".format(tenant_id, data_platform_id, applicant_id)
     dbhelper.execute_update(sql)
