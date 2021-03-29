@@ -11,7 +11,7 @@ from core.common.models import login_credentails_dto
 from core.common.repository import data_platform
 from core.common.repository import dp_applicant_login_info
 from core.common.repository import login_path
-from core.common.utils import google_login as login
+from core.common.utils import google_login as g_login
 from core.seleniumcore.pagefactory import seleniumcommon
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
@@ -51,7 +51,7 @@ def add_drivers_to_path():
     os.environ[path_constant] = new_path
 
 
-def login_to_application(tenant_id, data_platform_id, applicant_id, username, password, otp, applicant_login_info):
+def login_to_application(driver, tenant_id, data_platform_id, applicant_id, username, password, otp, applicant_login_info):
     login_credentails_dto.username = username
     login_credentails_dto.password = password
     login_credentails_dto.otp = otp
@@ -64,63 +64,63 @@ def login_to_application(tenant_id, data_platform_id, applicant_id, username, pa
     if applicant_login_info[login_status] == "in-progress":
         level = applicant_login_info[resume_from]
     instructions = login_path.fetch_login_path_instructions(data_platform_id, level)
-    instructions_to_perform(tenant_id, data_platform_id, applicant_id, instructions)
+    instructions_to_perform(driver, tenant_id, data_platform_id, applicant_id, instructions)
 
 
-def instructions_to_perform(tenant_id, data_platform_id, applicant_id, instructions):
+def instructions_to_perform(driver, tenant_id, data_platform_id, applicant_id, instructions):
     for instruction in instructions:
-        getattr(self, instruction_operations.options[instruction[op_name]])(tenant_id, applicant_id, instruction)
+        getattr(self, instruction_operations.options[instruction[op_name]])(driver, tenant_id, applicant_id, instruction)
 
 
-def create_driver():
-    add_drivers_to_path()
-    chrome_options = Options()
-    # chrome_options.add_argument("--disable-extensions")
-    # chrome_options.add_argument("--disable-popup-blocking")
-    # chrome_options.add_argument("--profile-directory=Default")
-    # chrome_options.add_argument("--ignore-certificate-errors")
-    # chrome_options.add_argument("--disable-plugins-discovery")
-    # #chrome_options.add_argument("--incognito")
-    # chrome_options.add_argument("--lang=en-us")
-    # chrome_options.add_argument("--disable-web-security")
-    # chrome_options.add_argument("--allow-running-insecure-content")
-    # chrome_options.add_argument("user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:46.0) Gecko/20100101 Firefox/46.0'")
-    # chrome_options.add_argument("start-maximized")
-    # chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    # chrome_options.add_experimental_option('useAutomationExtension', False)
-    # chrome_options.add_argument("--remote-debugging-port=9222")
-    # chrome_options.add_argument("--disable-web-security")
-    # chrome_options.add_argument("--allow-running-insecure-content")
-    # chrome_options.add_argument("--enable-experimental-cookie-features")
-    #chrome_options.add_experimental_option("excludeSwitches", ["disable-popup-blocking"])
+# def create_driver():
+#     add_drivers_to_path()
+#     chrome_options = Options()
+#     # chrome_options.add_argument("--disable-extensions")
+#     # chrome_options.add_argument("--disable-popup-blocking")
+#     # chrome_options.add_argument("--profile-directory=Default")
+#     # chrome_options.add_argument("--ignore-certificate-errors")
+#     # chrome_options.add_argument("--disable-plugins-discovery")
+#     # #chrome_options.add_argument("--incognito")
+#     # chrome_options.add_argument("--lang=en-us")
+#     # chrome_options.add_argument("--disable-web-security")
+#     # chrome_options.add_argument("--allow-running-insecure-content")
+#     # chrome_options.add_argument("user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:46.0) Gecko/20100101 Firefox/46.0'")
+#     # chrome_options.add_argument("start-maximized")
+#     # chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+#     # chrome_options.add_experimental_option('useAutomationExtension', False)
+#     # chrome_options.add_argument("--remote-debugging-port=9222")
+#     # chrome_options.add_argument("--disable-web-security")
+#     # chrome_options.add_argument("--allow-running-insecure-content")
+#     # chrome_options.add_argument("--enable-experimental-cookie-features")
+#     #chrome_options.add_experimental_option("excludeSwitches", ["disable-popup-blocking"])
+#
+#     # chrome_options.add_experimental_option("prefs", {"profile.block_third_party_cookies": False});
+#     # ua = UserAgent()
+#     # userAgent = ua.random
+#     # print(userAgent)
+#     # chrome_options.add_argument(f'user-agent={userAgent}')
+#     # chrome_options.add_experimental_option("excludeSwitches",
+#     #                                 ["ignore-certificate-errors", "safebrowsing-disable-download-protection",
+#     #                                  "safebrowsing-disable-auto-update", "disable-client-side-phishing-detection"])
+#     # driver = webdriver.Chrome(chrome_options=chrome_options)
+#     # driver.execute_cdp_cmd('Network.setUserAgentOverride', {
+#     #     "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'})
+#     # print(driver.execute_script("return navigator.userAgent;"))
+#
+#     global driver
+#     driver = webdriver.Chrome()
+#     #driver = webdriver.Firefox()
+#     driver.implicitly_wait(5)
 
-    # chrome_options.add_experimental_option("prefs", {"profile.block_third_party_cookies": False});
-    # ua = UserAgent()
-    # userAgent = ua.random
-    # print(userAgent)
-    # chrome_options.add_argument(f'user-agent={userAgent}')
-    # chrome_options.add_experimental_option("excludeSwitches",
-    #                                 ["ignore-certificate-errors", "safebrowsing-disable-download-protection",
-    #                                  "safebrowsing-disable-auto-update", "disable-client-side-phishing-detection"])
-    # driver = webdriver.Chrome(chrome_options=chrome_options)
-    # driver.execute_cdp_cmd('Network.setUserAgentOverride', {
-    #     "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'})
-    # print(driver.execute_script("return navigator.userAgent;"))
-
-    global driver
-    driver = webdriver.Chrome()
-    #driver = webdriver.Firefox()
-    driver.implicitly_wait(5)
-
-def navigate_url(tenant_id, applicant_id, instruction):
+def navigate_url(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
-    create_driver()
+    # create_driver()
     url = instruction[element_key_value]
     print("Navigating to URL: {}".format(url))
     driver.get(url);
 
 
-def verify(tenant_id, applicant_id, instruction):
+def verify(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     element_to_validate = instruction[element_identifier].split('=', 1)
     WebDriverWait(driver, element_wait_timeout).until(
@@ -128,7 +128,7 @@ def verify(tenant_id, applicant_id, instruction):
     return "Verifying element complete for " + str(element_to_validate)
 
 
-def fill(tenant_id, applicant_id, instruction):
+def fill(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     type_and_value = instruction[element_identifier].split('=', 1)
     if (instruction[element_key_value] is None):
@@ -156,13 +156,13 @@ def fill(tenant_id, applicant_id, instruction):
                                          type_and_value[0], type_and_value[1])
 
 
-def click(tenant_id, applicant_id, instruction):
+def click(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     type_and_value = instruction[element_identifier].split('=', 1)
     seleniumcommon.click(driver, type_and_value[0], type_and_value[1])
 
 
-def check(tenant_id, applicant_id, instruction):
+def check(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     type_and_value = instruction[element_identifier].split('=', 1)
     WebDriverWait(driver, element_wait_timeout).until(
@@ -171,7 +171,7 @@ def check(tenant_id, applicant_id, instruction):
         seleniumcommon.click(driver, type_and_value[0], type_and_value[1])
 
 
-def uncheck(tenant_id, applicant_id, instruction):
+def uncheck(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     type_and_value = instruction[element_identifier].split('=', 1)
     WebDriverWait(driver, element_wait_timeout).until(
@@ -180,17 +180,17 @@ def uncheck(tenant_id, applicant_id, instruction):
         seleniumcommon.click(driver, type_and_value[0], type_and_value[1])
 
 
-def fetch(tenant_id, applicant_id, instruction):
+def fetch(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     print("fetch TBD")
 
 
-def close_window(tenant_id, applicant_id, instruction):
+def close_window(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     seleniumcommon.stopdriver(driver)
 
 
-def save_mfa_session(tenant_id, applicant_id, instruction):
+def save_mfa_session(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     url = driver.current_url
     cookies = driver.get_cookies()
@@ -198,7 +198,7 @@ def save_mfa_session(tenant_id, applicant_id, instruction):
     dp_applicant_login_info.update_mfa_info(tenant_id, instruction[data_platform_id], applicant_id, True)
 
 
-def save_login_session(tenant_id, applicant_id, instruction):
+def save_login_session(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     url = driver.current_url
     cookies = driver.get_cookies()
@@ -206,12 +206,12 @@ def save_login_session(tenant_id, applicant_id, instruction):
                                                cookies)
 
 
-def load_mfa_session(tenant_id, applicant_id, instruction):
+def load_mfa_session(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     applicant_login_info = dp_applicant_login_info.fetch_dp_applicant_login_info(tenant_id, instruction[data_platform_id], applicant_id)
     temp_cookies = applicant_login_info[mfa_cookies]
     url = applicant_login_info[mfa_url]
-    create_driver()
+    # create_driver()
     driver.execute_cdp_cmd('Network.enable', {})
     cookies = eval(temp_cookies)
     for cookie in cookies:
@@ -221,12 +221,12 @@ def load_mfa_session(tenant_id, applicant_id, instruction):
     driver.get(url);
 
 
-def load_login_session(tenant_id, applicant_id, instruction):
+def load_login_session(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     applicant_login_info = dp_applicant_login_info.fetch_dp_applicant_login_info(tenant_id, instruction[data_platform_id], applicant_id)
     temp_cookies = applicant_login_info[login_cookies]
     url = applicant_login_info[login_url]
-    create_driver()
+    # create_driver()
     driver.execute_cdp_cmd('Network.enable', {})
     cookies = eval(temp_cookies)
     for cookie in cookies:
@@ -236,7 +236,7 @@ def load_login_session(tenant_id, applicant_id, instruction):
     driver.get(url);
 
 
-def verify_and_fork(tenant_id, applicant_id, instruction):
+def verify_and_fork(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     json_value = json.loads(instruction[element_identifier])
     for key, value in json_value.items():
@@ -249,7 +249,7 @@ def verify_and_fork(tenant_id, applicant_id, instruction):
             print("not able to find element, looking for another element")
 
 
-def google_login(tenant_id, applicant_id, instruction):
+def google_login(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     login_credentails_dto.driver = driver
     handles = driver.window_handles
@@ -258,8 +258,10 @@ def google_login(tenant_id, applicant_id, instruction):
     for x in range(size):
         if handles[x] != parent_handle:
             driver.switch_to.window(handles[x])
-            result = login.enter_username_password(login_credentails_dto.username, login_credentails_dto.password)
-            if result == True:
+            is_mfa_enabled = g_login.enter_credential(tenant_id, instruction[data_platform_id], applicant_id,
+                                                   login_credentails_dto.username, login_credentails_dto.password,
+                                                   login_credentails_dto.otp)
+            if is_mfa_enabled == True:
                 login.enter_otp()
             time.sleep(7)
             driver.quit()
@@ -268,17 +270,17 @@ def google_login(tenant_id, applicant_id, instruction):
     driver.switch_to.window(parent_handle)
 
 
-def facebook_login(tenant_id, applicant_id, instruction):
+def facebook_login(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     print("facebook_login TBD")
 
 
-def apple_login(tenant_id, applicant_id, instruction):
+def apple_login(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     print("apple_login TBD")
 
 
-def operation_completed(tenant_id, applicant_id, instruction):
+def operation_completed(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     applicant_login_info = dp_applicant_login_info.update_login_status(tenant_id, instruction[data_platform_id],
                                                                        applicant_id, 'uname-pwd', 'completed')
@@ -286,7 +288,7 @@ def operation_completed(tenant_id, applicant_id, instruction):
                                                                        applicant_id, '')
 
 
-def operation_in_progress(tenant_id, applicant_id, instruction):
+def operation_in_progress(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     applicant_login_info = dp_applicant_login_info.update_login_status(tenant_id, instruction[data_platform_id],
                                                                        applicant_id, 'uname-pwd', 'in-progress')
@@ -294,6 +296,6 @@ def operation_in_progress(tenant_id, applicant_id, instruction):
                                                                        applicant_id, instruction[element_key_value])
 
 
-def not_supported(tenant_id, applicant_id, instruction):
+def not_supported(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     print("not_supported TBD")

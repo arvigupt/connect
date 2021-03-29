@@ -15,15 +15,29 @@ def connect():
         print(error)
     return conn
 
-def execute_select(sql):
+# def execute_select(sql):
+#     try:
+#         temp_sql = "select row_to_json(row) from (" + sql + ") row"
+#         with connect().cursor() as cur:
+#             cur.execute(temp_sql)
+#             rs_dict = cur.fetchall()
+#     except Exception as e:
+#         raise Exception("Failed running sql {}. Error: {}".format(sql, str(e)))
+#
+#     return rs_dict
+
+
+def execute_select(sql, one=False):
     try:
-        with connect().cursor(cursor_factory = psycopg2.extras.DictCursor) as cur:
-            cur.execute(sql)
-            rs_dict = cur.fetchall()
+        cur = connect().cursor()
+        cur.execute(sql)
+        r = [dict((cur.description[i][0], value) \
+                   for i, value in enumerate(row)) for row in cur.fetchall()]
+        cur.connection.close()
+        return (r[0] if r else None) if one else r
     except Exception as e:
         raise Exception("Failed running sql {}. Error: {}".format(sql, str(e)))
 
-    return rs_dict
 
 def execute_insert(sql):
     try:

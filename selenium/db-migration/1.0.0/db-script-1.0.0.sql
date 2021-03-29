@@ -213,9 +213,9 @@ VALUES
 
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 1, 'id=login_control_submit', 'click', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 2, NULL, 'google-login', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 3, NULL, 'save-login-session', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 4, NULL, 'operation-completed', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 5, NULL, 'close-window', NULL, NULL),
+--('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 3, NULL, 'save-login-session', NULL, NULL),
+--('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 4, NULL, 'operation-completed', NULL, NULL),
+--('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.2', 5, NULL, 'close-window', NULL, NULL),
 
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.1', 1, NULL, 'save-login-session', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.1', 2, NULL, 'operation-completed', NULL, NULL),
