@@ -27,69 +27,7 @@ CREATE TABLE IF NOT EXISTS phyllo_schema.data_platform (
 ALTER TABLE phyllo_schema.data_platform OWNER TO phyllo;
 
 
-CREATE TABLE IF NOT EXISTS phyllo_schema.dp_oauth_information (
-	data_platform_id uuid NOT NULL,
-	authorize_url character varying(2048) NOT NULL,
-	token_url character varying(2048) NOT NULL,
-	refresh_token_url character varying(2048) NOT NULL,
-	client_id character varying(200) NOT NULL,
-	client_secret character varying(500) NOT NULL,
-	redirect_url character varying(2048) NOT NULL,
-	CONSTRAINT pkey_dp_oauth_information_id PRIMARY KEY(id),
-	CONSTRAINT fkey_dp_oauth_information_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id)
-)INHERITS (phyllo_schema.common);
-ALTER TABLE phyllo_schema.dp_oauth_information OWNER TO phyllo;
-
-
-CREATE TABLE IF NOT EXISTS phyllo_schema.dp_authorize_builder (
-	data_platform_id uuid NOT NULL,
-	method character varying(10) NOT NULL,
-	client_id_param_name character varying(100) NOT NULL,
-	client_id_param_name_in character varying(50) NOT NULL,
-	client_secret_param_name character varying(100) NOT NULL,
-	client_secret_param_name_in character varying(50) NOT NULL,
-	redirect_url_param_name character varying(100) NOT NULL,
-	redirect_url_param_name_in character varying(50) NOT NULL,
-	content_type_header_name character varying(100) NOT NULL,
-	CONSTRAINT pkey_dp_authorize_builder_id PRIMARY KEY(id),
-	CONSTRAINT fkey_dp_authorize_builder_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id)
-)INHERITS (phyllo_schema.common);
-ALTER TABLE phyllo_schema.dp_authorize_builder OWNER TO phyllo;
-
-
-CREATE TABLE IF NOT EXISTS phyllo_schema.dp_token_builder (
-	data_platform_id uuid NOT NULL,
-	method character varying(10) NOT NULL,
-	client_id_param_name character varying(100) NOT NULL,
-	client_id_param_name_in character varying(50) NOT NULL,
-	client_secret_param_name character varying(100) NOT NULL,
-	client_secret_param_name_in character varying(50) NOT NULL,
-	redirect_url_param_name character varying(100) NOT NULL,
-	redirect_url_param_name_in character varying(50) NOT NULL,
-	content_type_header_name character varying(100) NOT NULL,
-	CONSTRAINT pkey_dp_token_builder_id PRIMARY KEY(id),
-	CONSTRAINT fkey_dp_token_builder_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id)
-)INHERITS (phyllo_schema.common);
-ALTER TABLE phyllo_schema.dp_token_builder OWNER TO phyllo;
-
-
-CREATE TABLE IF NOT EXISTS phyllo_schema.dp_refresh_token_builder (
-	data_platform_id uuid NOT NULL,
-	method character varying(10) NOT NULL,
-	client_id_param_name character varying(100) NOT NULL,
-	client_id_param_name_in character varying(50) NOT NULL,
-	client_secret_param_name character varying(100) NOT NULL,
-	client_secret_param_name_in character varying(50) NOT NULL,
-	redirect_url_param_name character varying(100) NOT NULL,
-	redirect_url_param_name_in character varying(50) NOT NULL,
-	content_type_header_name character varying(50) NOT NULL,
-	CONSTRAINT pkey_dp_refresh_token_builder_id PRIMARY KEY(id),
-	CONSTRAINT fkey_dp_refresh_token_builder_data_platform_id FOREIGN KEY(data_platform_id) REFERENCES phyllo_schema.data_platform(id)
-)INHERITS (phyllo_schema.common);
-ALTER TABLE phyllo_schema.dp_refresh_token_builder OWNER TO phyllo;
-
-
--- op_name enum = fill | click | check | uncheck | fetch | verify | save-mfa-session | save-login-session | open-browser | close-browser | navigate-url | verify-and-fork | operaton-completed | operaton-in-progress | 
+-- op_name enum = fill | click | check | uncheck | fetch | verify | save-mfa-session | save-login-session | open-browser | close-browser | navigate-url | verify-and-fork | operaton-completed | operaton-in-progress |
 CREATE TABLE IF NOT EXISTS phyllo_schema.dp_login_path (
 	data_platform_id uuid NOT NULL,
 	level character varying(100) NOT NULL,
@@ -157,6 +95,7 @@ CREATE TABLE IF NOT EXISTS phyllo_schema.dp_applicant_login_info (
 	login_cookies character varying,
 	login_status character varying(100), -- none | in-progress | completed
 	resume_from character varying(100),
+	session_id character varying,
 	--UNIQUE(data_platform_id, applicant_id),
 	CONSTRAINT pkey_dp_applicant_login_info_id PRIMARY KEY(id),
 	CONSTRAINT fkey_applicant_tenant_id FOREIGN KEY(tenant_id) REFERENCES phyllo_schema.tenant(id),
@@ -201,7 +140,7 @@ INSERT INTO phyllo_schema.data_platform(id, name, url, logo_url, is_oauth_suppor
 INSERT INTO phyllo_schema.dp_login_path(data_platform_id, level, sequence_no, element_identifier, op_name, element_key_name, element_key_value)
 VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 1, NULL, 'navigate-url', 'login-url', 'https://www.upwork.com/ab/account-security/login'),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 2, 'xpath=//a[text()=''Upwork'']', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 2, 'xpath=//a[text()=''Upwork'']', 'verify', 'element', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 3, 'id=login_username', 'fill', 'username', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 4, 'id=login_password_continue', 'click', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1', 5, '{"id=login_password": "1.1", "id=login_control_submit": "1.2"}', 'verify-and-fork', NULL, NULL),
@@ -226,11 +165,11 @@ VALUES
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '1.1.2', 3, NULL, 'close-window', NULL, NULL),
 
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 1, NULL, 'load-mfa-session', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 2, 'xpath=//h2[text()=''Confirm that it''s you'']', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 2, 'xpath=//h2[text()=''Confirm that it''s you'']', 'verify', 'element', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 3, 'id=login_deviceAuthOtp_otp', 'fill', 'otp', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 4, 'id=login_deviceAuthOtp_remember', 'check', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 5, 'id=login_control_continue', 'click', NULL, NULL),
-('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 6, 'xpath=//img[contains(@class,''nav-avatar nav-user-avatar'')]', 'verify', NULL, NULL),
+('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 6, 'xpath=//img[contains(@class,''nav-avatar nav-user-avatar'')]', 'verify', 'element', NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 7, NULL, 'save-login-session', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 8, NULL, 'operation-completed', NULL, NULL),
 ('034181db-f4f9-426b-b9ee-83a66fd42c6d', '2', 9, NULL, 'close-window', NULL, NULL)
@@ -257,11 +196,11 @@ INSERT INTO phyllo_schema.data_platform(id, name, url, logo_url, is_oauth_suppor
 INSERT INTO phyllo_schema.dp_login_path(data_platform_id, level, sequence_no, element_identifier, op_name, element_key_name, element_key_value)
 VALUES
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 1, NULL, 'navigate-url', 'login-url', 'https://www.udemy.com/join/login-popup'),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 2, 'xpath=//a[text()=''Udemy'']', 'verify', NULL, NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', 2, 'xpath=//a[text()=''Udemy'']', 'verify', 'element', NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 3, 'id=form-item-email', 'fill', 'username', NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 4, 'id=form-item-password', 'fill', 'password', NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 5, 'id=submit-id-submit', 'click', NULL, NULL),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 6, 'xpath=//a[text()=''Udemy'']', 'verify', NULL, NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', 6, 'xpath=//a[text()=''Udemy'']', 'verify', 'element', NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 7, NULL, 'save-login-session', NULL, NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 8, NULL, 'operation-completed', NULL, NULL),
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 9, NULL, 'close-window', NULL, NULL)
@@ -290,15 +229,11 @@ VALUES
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '1.2', 3, NULL, 'close-window', NULL, NULL),
 
 ('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 1, NULL, 'load-mfa-session', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 2, 'id=email', 'fill', 'username', NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 3, 'id=password', 'fill', 'password', NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 4, 'id=signin_btn', 'click', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 5, 'xpath=//*[@id=''page_contents'']/div/div[2]/form/div/input', 'fill', 'otp', NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 6, 'id=signin_btn', 'click', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 7, 'xpath=//*[@id=''page_contents'']/div/div/div[2]/h1]', 'verify', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 8, NULL, 'save-login-session', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 9, NULL, 'operation-completed', NULL, NULL),
-('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 10, NULL, 'close-window', NULL, NULL)
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 2, 'xpath=//*[@id=''page_contents'']/div/div[2]/form/div/input', 'fill', 'otp', NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 3, 'id=signin_btn', 'click', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 4, 'https://phyllo.slack.com/ssb/redirect?entry_point=workspace_signin', 'verify', 'url', NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 5, NULL, 'save-login-session', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 6, NULL, 'operation-completed', NULL, NULL),
+('a2a35c6c-fc3c-40c5-b503-9cdecf889bba', '2', 7, NULL, 'close-window', NULL, NULL)
 ON CONFLICT DO NOTHING;
 
-//*[@id="page_contents"]/div/div/div[2]/h1

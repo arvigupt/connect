@@ -19,12 +19,12 @@ def fetch_dp_applicant_login_info(tenant_id, data_platform_id, applicant_id):
         return result[0]
     return None
 
-def update_mfa_cookies(tenant_id, data_platform_id, applicant_id, url, cookies):
+def update_mfa_cookies(tenant_id, data_platform_id, applicant_id, url, cookies, session_id):
     temp_cookies = str(cookies)
     temp_cookies = temp_cookies.replace("'", "''")
-    sql = "UPDATE phyllo_schema.dp_applicant_login_info SET mfa_url = '{}', mfa_cookies = '{}' WHERE tenant_id = '{}' AND " \
-          "data_platform_id = '{}' AND applicant_id = '{}'".format(
-        url, temp_cookies, tenant_id, data_platform_id, applicant_id)
+    sql = "UPDATE phyllo_schema.dp_applicant_login_info SET mfa_url = '{}', mfa_cookies = '{}', session_id = '{}' " \
+          "WHERE tenant_id = '{}' AND data_platform_id = '{}' AND applicant_id = '{}'".format(
+        url, temp_cookies, session_id, tenant_id, data_platform_id, applicant_id)
     dbhelper.execute_update(sql)
 
 def update_login_cookies(tenant_id, data_platform_id, applicant_id, url, cookies):

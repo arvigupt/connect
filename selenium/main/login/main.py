@@ -5,8 +5,18 @@ from core.common.models.UserCredential import UserCredential
 import uvicorn
 import datetime
 import json
+import os
 from typing import Optional
 from fastapi import FastAPI, Header
+
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver import Firefox, DesiredCapabilities
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 
 login_status = 'login_status'
@@ -71,7 +81,6 @@ def get_remote_firefox(url):
 
 def get_remote_chrome(url):
     options = Options()
-    # options.add_argument('--headless')
     options.add_argument( "no-sandbox" )
     options.add_argument( "--disable-dev-shm-usage" )
     options.add_argument( "--disable-infobars" )
@@ -79,20 +88,22 @@ def get_remote_chrome(url):
     driver = webdriver.Remote( command_executor=url, desired_capabilities=options.to_capabilities() )
     return driver
 
-def get_chrome_driver():
-    options = Options()
-    # options.add_argument('--headless')
+def get_grid_driver():
+    print("executing get_grid_driver")
+    options = webdriver.ChromeOptions()
     options.add_argument( "no-sandbox" )
+    options.add_argument( "--disable-gpu" )
+    options.add_argument( "--incognito" )
+    options.add_argument("--disable-infobars")
+    options.add_argument( "--window-size=800,600" )
     options.add_argument( "--disable-dev-shm-usage" )
-    options.add_argument( "--disable-infobars" )
-    options.add_argument( '--disable-gpu' )  # Last I checked this was necessary.
-    chromedriver = "/Users/mohit/Downloads/chromedriver"
-    os.environ["webdriver.chrome.driver"] = chromedriver
-    driver = webdriver.Chrome( chromedriver, options=options, keep_alive=True )
-    driver.set_page_load_timeout( 3000000 )
-    driver.set_script_timeout( 3000000 )
+    driver = webdriver.Remote(
+        command_executor="http://192.168.43.133:4444/wd/hub",
+        desired_capabilities=DesiredCapabilities.CHROME, options=options )
     return driver
-#
+
+
+
 def start_login(driver, tenant_id, data_platform_id, applicant_id, username, password, otp, relogin):
     applicant_login_info = dp_applicant_login_info.fetch_dp_applicant_login_info(tenant_id, data_platform_id, applicant_id)
     applicant_username = username
@@ -107,7 +118,6 @@ def start_login(driver, tenant_id, data_platform_id, applicant_id, username, pas
         applicant_username = applicant_login_info['username']
         applicant_pwd = applicant_login_info['pwd']
     elif applicant_login_info[login_status] == "completed":
-        option = input("Previous login operation is completed. Do you want to start again (Y/N): ")
         if relogin == True:
             dp_applicant_login_info.delete_dp_applicant_login_info(tenant_id, data_platform_id, applicant_id)
             dp_applicant_login_info.insert_dp_applicant_login_info(tenant_id, data_platform_id, applicant_id)
@@ -148,19 +158,6 @@ def start_login(driver, tenant_id, data_platform_id, applicant_id, username, pas
 #     driver.refresh()
 #     driver.get( 'https://linkageapi.slack.com/' )
 
-
-def get_grid_driver():
-    options = webdriver.ChromeOptions()
-    options.add_argument( "no-sandbox" )
-    options.add_argument( "--disable-gpu" )
-    # options.add_argument( '--headless' )
-    options.add_argument( "--incognito" )
-    options.add_argument( "--window-size=800,600" )
-    options.add_argument( "--disable-dev-shm-usage" )
-    driver = webdriver.Remote(
-        command_executor="http://192.168.0.102:4444/wd/hub",
-        desired_capabilities=DesiredCapabilities.CHROME, options=options )
-    return driver
 
 
 if __name__ == '__main__':

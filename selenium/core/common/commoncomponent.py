@@ -122,9 +122,18 @@ def navigate_url(driver, tenant_id, applicant_id, instruction):
 
 def verify(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
-    element_to_validate = instruction[element_identifier].split('=', 1)
-    WebDriverWait(driver, element_wait_timeout).until(
-        EC.presence_of_element_located((element_to_validate[0], element_to_validate[1])))
+    verify_type = instruction[element_key_name]
+    if verify_type == "element":
+        element_to_validate = instruction[element_identifier].split('=', 1)
+        WebDriverWait(driver, element_wait_timeout).until(
+            EC.presence_of_element_located((element_to_validate[0], element_to_validate[1])))
+    elif verify_type == "url":
+        driver.implicitly_wait(element_wait_timeout)
+        url = driver.current_url
+        url_to_validate = instruction[element_identifier]
+        Assert.assertTrue(url, url_to_validate)
+    else:
+        raise "not supported"
     return "Verifying element complete for " + str(element_to_validate)
 
 
@@ -187,14 +196,15 @@ def fetch(driver, tenant_id, applicant_id, instruction):
 
 def close_window(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
-    seleniumcommon.stopdriver(driver)
+    # seleniumcommon.stopdriver(driver)
 
 
 def save_mfa_session(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     url = driver.current_url
     cookies = driver.get_cookies()
-    dp_applicant_login_info.update_mfa_cookies(tenant_id, instruction[data_platform_id], applicant_id,  url, cookies)
+    session_id = driver.session_id
+    dp_applicant_login_info.update_mfa_cookies(tenant_id, instruction[data_platform_id], applicant_id,  url, cookies, session_id)
     dp_applicant_login_info.update_mfa_info(tenant_id, instruction[data_platform_id], applicant_id, True)
 
 
@@ -209,16 +219,18 @@ def save_login_session(driver, tenant_id, applicant_id, instruction):
 def load_mfa_session(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     applicant_login_info = dp_applicant_login_info.fetch_dp_applicant_login_info(tenant_id, instruction[data_platform_id], applicant_id)
-    temp_cookies = applicant_login_info[mfa_cookies]
-    url = applicant_login_info[mfa_url]
-    # create_driver()
-    driver.execute_cdp_cmd('Network.enable', {})
-    cookies = eval(temp_cookies)
-    for cookie in cookies:
-        driver.execute_cdp_cmd('Network.setCookie', cookie)
-    driver.execute_cdp_cmd('Network.disable', {})
-    print("Navigating to URL: {}".format(url))
-    driver.get(url);
+    # temp_cookies = applicant_login_info[mfa_cookies]
+    # url = applicant_login_info[mfa_url]
+    driver.close()
+    driver.quit()
+    driver.session_id = applicant_login_info['session_id']
+    # driver.execute_cdp_cmd('Network.enable', {})
+    # cookies = eval(temp_cookies)
+    # for cookie in cookies:
+    #     driver.execute_cdp_cmd('Network.setCookie', cookie)
+    # driver.execute_cdp_cmd('Network.disable', {})
+    print("Navigating to URL: {}".format(driver.current_url))
+    # driver.get(url);
 
 
 def load_login_session(driver, tenant_id, applicant_id, instruction):
@@ -244,7 +256,7 @@ def verify_and_fork(driver, tenant_id, applicant_id, instruction):
         time.sleep(5)
         if (seleniumcommon.is_element_visible(driver, element_to_verify[0], element_to_verify[1])):
             instructions = login_path.fetch_login_path_instructions(instruction[data_platform_id], value)
-            instructions_to_perform(tenant_id, instruction[data_platform_id], applicant_id, instructions)
+            instructions_to_perform(driver, tenant_id, instruction[data_platform_id], applicant_id, instructions)
         else:
             print("not able to find element, looking for another element")
 
