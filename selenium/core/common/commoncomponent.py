@@ -18,6 +18,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from fake_useragent import UserAgent
+import unittest
 
 
 element_wait_timeout = 10
@@ -32,6 +33,7 @@ mfa_cookies = 'mfa_cookies'
 mfa_url = 'mfa_url'
 login_cookies = 'login_cookies'
 login_url = 'login_url'
+session_id = 'session_id'
 
 
 def add_drivers_to_path():
@@ -72,46 +74,6 @@ def instructions_to_perform(driver, tenant_id, data_platform_id, applicant_id, i
         getattr(self, instruction_operations.options[instruction[op_name]])(driver, tenant_id, applicant_id, instruction)
 
 
-# def create_driver():
-#     add_drivers_to_path()
-#     chrome_options = Options()
-#     # chrome_options.add_argument("--disable-extensions")
-#     # chrome_options.add_argument("--disable-popup-blocking")
-#     # chrome_options.add_argument("--profile-directory=Default")
-#     # chrome_options.add_argument("--ignore-certificate-errors")
-#     # chrome_options.add_argument("--disable-plugins-discovery")
-#     # #chrome_options.add_argument("--incognito")
-#     # chrome_options.add_argument("--lang=en-us")
-#     # chrome_options.add_argument("--disable-web-security")
-#     # chrome_options.add_argument("--allow-running-insecure-content")
-#     # chrome_options.add_argument("user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:46.0) Gecko/20100101 Firefox/46.0'")
-#     # chrome_options.add_argument("start-maximized")
-#     # chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-#     # chrome_options.add_experimental_option('useAutomationExtension', False)
-#     # chrome_options.add_argument("--remote-debugging-port=9222")
-#     # chrome_options.add_argument("--disable-web-security")
-#     # chrome_options.add_argument("--allow-running-insecure-content")
-#     # chrome_options.add_argument("--enable-experimental-cookie-features")
-#     #chrome_options.add_experimental_option("excludeSwitches", ["disable-popup-blocking"])
-#
-#     # chrome_options.add_experimental_option("prefs", {"profile.block_third_party_cookies": False});
-#     # ua = UserAgent()
-#     # userAgent = ua.random
-#     # print(userAgent)
-#     # chrome_options.add_argument(f'user-agent={userAgent}')
-#     # chrome_options.add_experimental_option("excludeSwitches",
-#     #                                 ["ignore-certificate-errors", "safebrowsing-disable-download-protection",
-#     #                                  "safebrowsing-disable-auto-update", "disable-client-side-phishing-detection"])
-#     # driver = webdriver.Chrome(chrome_options=chrome_options)
-#     # driver.execute_cdp_cmd('Network.setUserAgentOverride', {
-#     #     "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'})
-#     # print(driver.execute_script("return navigator.userAgent;"))
-#
-#     global driver
-#     driver = webdriver.Chrome()
-#     #driver = webdriver.Firefox()
-#     driver.implicitly_wait(5)
-
 def navigate_url(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     # create_driver()
@@ -128,10 +90,13 @@ def verify(driver, tenant_id, applicant_id, instruction):
         WebDriverWait(driver, element_wait_timeout).until(
             EC.presence_of_element_located((element_to_validate[0], element_to_validate[1])))
     elif verify_type == "url":
+        element_to_validate = instruction[element_identifier]
         driver.implicitly_wait(element_wait_timeout)
         url = driver.current_url
-        url_to_validate = instruction[element_identifier]
-        Assert.assertTrue(url, url_to_validate)
+        print ("url = {}".format(url))
+        print("element_to_validate url = {}".format(element_to_validate))
+        if url != element_to_validate:
+            raise "could not match success login url"
     else:
         raise "not supported"
     return "Verifying element complete for " + str(element_to_validate)
@@ -212,18 +177,19 @@ def save_login_session(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
     url = driver.current_url
     cookies = driver.get_cookies()
-    dp_applicant_login_info.update_login_cookies(tenant_id, instruction[data_platform_id], applicant_id, url,
-                                               cookies)
+    dp_applicant_login_info.update_login_cookies(tenant_id, instruction[data_platform_id], applicant_id, url, cookies)
 
 
 def load_mfa_session(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
-    applicant_login_info = dp_applicant_login_info.fetch_dp_applicant_login_info(tenant_id, instruction[data_platform_id], applicant_id)
-    # temp_cookies = applicant_login_info[mfa_cookies]
-    # url = applicant_login_info[mfa_url]
+    applicant_login_info = dp_applicant_login_info.fetch_dp_applicant_login_info(tenant_id, instruction[data_platform_id],
+                                                                                 applicant_id)
     driver.close()
     driver.quit()
-    driver.session_id = applicant_login_info['session_id']
+    driver.session_id = applicant_login_info[session_id]
+
+    # temp_cookies = applicant_login_info[mfa_cookies]
+    # url = applicant_login_info[mfa_url]
     # driver.execute_cdp_cmd('Network.enable', {})
     # cookies = eval(temp_cookies)
     # for cookie in cookies:
@@ -263,23 +229,20 @@ def verify_and_fork(driver, tenant_id, applicant_id, instruction):
 
 def google_login(driver, tenant_id, applicant_id, instruction):
     print("Executing instruction {}".format(instruction))
-    login_credentails_dto.driver = driver
+    time.sleep(10)
     handles = driver.window_handles
     size = len(handles)
     parent_handle = driver.current_window_handle
     for x in range(size):
         if handles[x] != parent_handle:
             driver.switch_to.window(handles[x])
-            is_mfa_enabled = g_login.enter_credential(tenant_id, instruction[data_platform_id], applicant_id,
+            is_mfa_enabled = g_login.enter_credential(driver, tenant_id, instruction[data_platform_id], applicant_id,
                                                    login_credentails_dto.username, login_credentails_dto.password,
                                                    login_credentails_dto.otp)
             if is_mfa_enabled == True:
-                login.enter_otp()
-            time.sleep(7)
-            driver.quit()
+                driver.close()
+                driver.quit()
             break
-
-    driver.switch_to.window(parent_handle)
 
 
 def facebook_login(driver, tenant_id, applicant_id, instruction):
@@ -298,6 +261,8 @@ def operation_completed(driver, tenant_id, applicant_id, instruction):
                                                                        applicant_id, 'uname-pwd', 'completed')
     applicant_login_info = dp_applicant_login_info.update_resume_from(tenant_id, instruction[data_platform_id],
                                                                        applicant_id, '')
+    driver.close()
+    driver.quit()
 
 
 def operation_in_progress(driver, tenant_id, applicant_id, instruction):

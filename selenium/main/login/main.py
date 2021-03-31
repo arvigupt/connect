@@ -20,12 +20,8 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 
 login_status = 'login_status'
-# async_mode = None
 app = FastAPI()
-# thread = None
-# thread_lock = Lock()
-# session_id = None
-
+grid_url = "http://localhost:4444/wd/hub"
 
 def default(o):
     if isinstance(o, (datetime.date, datetime.datetime)):
@@ -45,6 +41,7 @@ def get_platforms(authorization: Optional[str] = Header(None)):
     result = data_platform.fetch_data_platforms()
     return convert_response_into_json(result)
 
+
 @app.get("/platforms/{platform_name}")
 def get_platform_by_name(platform_name, authorization: Optional[str] = Header(None)):
     check_authorization_value(authorization)
@@ -55,53 +52,49 @@ def get_platform_by_name(platform_name, authorization: Optional[str] = Header(No
 @app.post("/platforms")
 def get_platforms(credential: UserCredential, authorization: Optional[str] = Header(None)):
     check_authorization_value(authorization)
-    driver = get_grid_driver()
+    driver = get_firefox_driver()
     result = start_login(driver, credential.tenant_id, credential.data_platform_id, credential.applicant_id, credential.username,
                          credential.password, credential.otp, credential.relogin)
     return convert_response_into_json(result)
 
 
 def get_firefox_driver():
-    options = FirefoxOptions()
-    options.add_argument( "--window-size 1920,1080" )
-    # options.add_argument( "--headless" )
-    driver = Firefox( options=options )
+    print("executing get_firefox_driver")
+    options = webdriver.FirefoxOptions()
+    # options.add_argument( "no-sandbox" )
+    # options.add_argument( "--disable-gpu" )
+    options.add_argument( "-private" )
+    # options.add_argument("--disable-infobars")
+    # options.add_argument( "--disable-dev-shm-usage" )
+    # options.add_argument("start-maximized");
+    # options.add_argument("ignore-certificate-errors");
+    # options.add_argument("disable-popup-blocking");
+    # options.add_argument("disable-extensions");
+    # options.add_argument("disable-notifications");
+    driver = webdriver.Remote(command_executor=grid_url, desired_capabilities=DesiredCapabilities.FIREFOX, options=options )
     return driver
 
 
-def get_remote_firefox(url):
-    firefox_capabilities = DesiredCapabilities.FIREFOX
-    firefox_capabilities['marionette'] = True
-    options = FirefoxOptions()
-    options.add_argument( "--window-size 1920,1080" )
-    # options.add_argument( "--headless" )
-    driver = webdriver.Remote( command_executor=url, desired_capabilities=firefox_capabilities )
-    return driver
-
-
-def get_remote_chrome(url):
-    options = Options()
-    options.add_argument( "no-sandbox" )
-    options.add_argument( "--disable-dev-shm-usage" )
-    options.add_argument( "--disable-infobars" )
-    options.add_argument( '--disable-gpu' )  # Last I checked this was necessary.
-    driver = webdriver.Remote( command_executor=url, desired_capabilities=options.to_capabilities() )
-    return driver
-
-def get_grid_driver():
-    print("executing get_grid_driver")
+def get_chrome_driver():
+    print("executing get_chrome_driver")
     options = webdriver.ChromeOptions()
     options.add_argument( "no-sandbox" )
     options.add_argument( "--disable-gpu" )
     options.add_argument( "--incognito" )
     options.add_argument("--disable-infobars")
-    options.add_argument( "--window-size=800,600" )
+    # options.add_argument( "--window-size=800,600" )
     options.add_argument( "--disable-dev-shm-usage" )
-    driver = webdriver.Remote(
-        command_executor="http://192.168.43.133:4444/wd/hub",
-        desired_capabilities=DesiredCapabilities.CHROME, options=options )
+    options.add_argument("start-maximized");
+    options.add_argument("ignore-certificate-errors");
+    options.add_argument("disable-popup-blocking");
+    options.add_argument("disable-extensions");
+    options.add_argument("disable-notifications");
+    # options.add_experimental_option("prefs", {"profile.allow_all_cookies": True});
+    options.add_experimental_option("prefs", {"profile.enable-cookies": True});
+    # options.add_argument("enable-cookies");
+    # options.add_experimental_option("prefs", {"profile.default_content_settings.cookies": 2});
+    driver = webdriver.Remote(command_executor=grid_url, desired_capabilities=DesiredCapabilities.CHROME, options=options )
     return driver
-
 
 
 def start_login(driver, tenant_id, data_platform_id, applicant_id, username, password, otp, relogin):
@@ -127,37 +120,8 @@ def start_login(driver, tenant_id, data_platform_id, applicant_id, username, pas
         else:
             print("Operation completed successfully.")
             exit(1)
-
     commoncomponent.login_to_application(driver, tenant_id, data_platform_id, applicant_id, applicant_username, applicant_pwd,
                                          applicant_otp, applicant_login_info)
-
-
-# def reuse_browser(url, browser_id, p_otp):
-#     driver = get_remote_chrome( url )
-#     driver.close()
-#     driver.quit()
-#     driver.session_id = browser_id
-#     auth_elem = driver.find_element_by_class_name( 'auth_code' )
-#     sign_in_elem = driver.find_element_by_id( 'signin_btn' )
-#     auth_elem.send_keys( p_otp )
-#     sign_in_elem.click()
-#     driver.implicitly_wait( 100 )
-#     print( driver.current_url )
-#     pickle.dump( driver.get_cookies(), open( "cookies.pkl", "wb" ) )
-#     driver.quit()
-#
-#
-# def reopen_session():
-#     driver = get_grid_driver()
-#     cookies = pickle.load( open( "cookies.pkl", "rb" ) )
-#     driver.get( 'https://linkageapi.slack.com/' )
-#     for cookie in cookies:
-#         if 'expiry' in cookie:
-#             cookie['expiry'] = int( cookie['expiry'] )
-#         driver.add_cookie( cookie )
-#     driver.refresh()
-#     driver.get( 'https://linkageapi.slack.com/' )
-
 
 
 if __name__ == '__main__':

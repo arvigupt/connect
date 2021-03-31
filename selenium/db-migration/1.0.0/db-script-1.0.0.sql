@@ -196,14 +196,13 @@ INSERT INTO phyllo_schema.data_platform(id, name, url, logo_url, is_oauth_suppor
 INSERT INTO phyllo_schema.dp_login_path(data_platform_id, level, sequence_no, element_identifier, op_name, element_key_name, element_key_value)
 VALUES
 ('199a2144-c599-4e06-84f4-d18836127a6b', '1', 1, NULL, 'navigate-url', 'login-url', 'https://www.udemy.com/join/login-popup'),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 2, 'xpath=//a[text()=''Udemy'']', 'verify', 'element', NULL),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 3, 'id=form-item-email', 'fill', 'username', NULL),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 4, 'id=form-item-password', 'fill', 'password', NULL),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 5, 'id=submit-id-submit', 'click', NULL, NULL),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 6, 'xpath=//a[text()=''Udemy'']', 'verify', 'element', NULL),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 7, NULL, 'save-login-session', NULL, NULL),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 8, NULL, 'operation-completed', NULL, NULL),
-('199a2144-c599-4e06-84f4-d18836127a6b', '1', 9, NULL, 'close-window', NULL, NULL)
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', 2, 'id=form-item-email', 'fill', 'username', NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', 3, 'id=form-item-password', 'fill', 'password', NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', 4, 'id=submit-id-submit', 'click', NULL, NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', 5, 'xpath=/html/body/div[2]/div[1]/div[3]/div[9]/a/img', 'verify', 'element', NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', 6, NULL, 'save-login-session', NULL, NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', 7, NULL, 'operation-completed', NULL, NULL),
+('199a2144-c599-4e06-84f4-d18836127a6b', '1', 8, NULL, 'close-window', NULL, NULL)
 ON CONFLICT DO NOTHING;
 
 
